@@ -494,7 +494,7 @@
     }
 
     /* =======================================================================
-       CARTÕES DE PEDIDOS E PROPOSTAS
+       CARTÕES DE PEDIDOS, CICLOS DE 3 PESSOAS E PROPOSTAS
        ======================================================================= */
     .filter-bar {
       display: flex;
@@ -531,6 +531,23 @@
       flex-direction: column;
       gap: 14px;
       margin-top: 14px;
+    }
+
+    .triangle-box {
+      background-color: var(--bdx-tint) !important;
+      border: 1px solid var(--bdx);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      margin-top: 14px;
+    }
+
+    .triangle-item {
+      background-color: #ffffff !important;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      margin-top: 8px;
+      font-size: 0.8rem;
     }
 
     .swap-card {
@@ -849,7 +866,7 @@
           Coordenação rápida de trocas de turnos sem mensagens soltas no grupo
         </h2>
         <p style="margin:0; font-size:0.84rem; color:#5c434a;">
-          Escolhe o dia e o turno que pretendes ceder (<strong>M</strong>, <strong>T</strong> ou <strong>N</strong>), indica os turnos de outros dias que aceitas fazer em troca e recebe notificações quando houver match.
+          Escolhe o dia e o turno que pretendes ceder (<strong>M</strong>, <strong>T</strong> ou <strong>N</strong>), indica os turnos de outros dias que aceitas fazer em troca e recebe notificações quando houver match (direto ou em cadeia de 3 pessoas).
         </p>
         <div class="schedule-strip">
           <span class="badge shift-pill-M">M · Manhã (08h00 – 15h30)</span>
@@ -994,6 +1011,15 @@
               <button type="button" class="filter-pill" data-filter-elig="CHEFE_EQUIPA">Exclusivo Chefe de Equipa</button>
               <button type="button" class="filter-pill" data-filter-elig="ENF_RESPONSAVEL">Exclusivo Enf. Responsável</button>
             </div>
+          </div>
+
+          <!-- Matches Automáticos de 3 Pessoas (A -> B -> C -> A) -->
+          <div id="triangleMatchesSection" class="triangle-box hidden" aria-live="polite">
+            <div class="section-kicker" style="margin-bottom:4px;">Matches Automáticos Detetados em Background (3 Pessoas)</div>
+            <p style="margin:0; font-size:0.78rem; color:#5c434a;">
+              Ciclos compatíveis detetados automaticamente: a pessoa A faz um turno aceite pela pessoa B, a pessoa B faz um turno aceite pela pessoa C e a pessoa C faz um turno aceite pela pessoa A.
+            </p>
+            <div id="triangleMatchesList"></div>
           </div>
 
           <div id="requestsBoardList" class="requests-stack"></div>
@@ -1329,7 +1355,8 @@
         SESSION: 'sug_hff_session_v2',
         REQUESTS: 'sug_hff_requests_v2',
         NOTIFS: 'sug_hff_notifs_v2',
-        SYNC: 'sug_hff_sync_v2'
+        SYNC: 'sug_hff_sync_v2',
+        NOTIFIED_CYCLES: 'sug_hff_notified_cycles_v2'
       };
 
       const SHIFT_INFO = {
@@ -1371,6 +1398,11 @@
         const dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
         if (Number.isNaN(dt.getTime())) return iso;
         return dt.toLocaleDateString('pt-PT', { weekday: 'short', day: '2-digit', month: 'short' });
+      }
+
+      function formatShiftLabel(dateISO, shiftCode) {
+        const info = SHIFT_INFO[shiftCode] || SHIFT_INFO.M;
+        return `${formatDatePT(dateISO)} · ${info.code} (${info.schedule})`;
       }
 
       function escapeHTML(str) {
@@ -1498,6 +1530,7 @@
       let currentUser = loadJSON(KEYS.SESSION, null);
       let swapRequests = loadJSON(KEYS.REQUESTS, seedRequests);
       let notifications = loadJSON(KEYS.NOTIFS, []);
+      let notifiedCycleKeys = loadJSON(KEYS.NOTIFIED_CYCLES, []);
       let syncConfig = Object.assign(
         { mode: 'LOCAL', url: '', room: 'SUG_HFF_GERAL', intervalMs: 15000 },
         loadJSON(KEYS.SYNC, {})
@@ -1505,6 +1538,7 @@
 
       let draftOffers = [];
       let pollTimer = null;
+      let triangleCycles = [];
 
       const activeFilters = {
         search: '',
@@ -1544,6 +1578,8 @@
       const eligibilitySelect = document.getElementById('eligibilitySelect');
       const requestNotesInput = document.getElementById('requestNotesInput');
 
+      const triangleMatchesSection = document.getElementById('triangleMatchesSection');
+      const triangleMatchesList = document.getElementById('triangleMatchesList');
       const requestsBoardList = document.getElementById('requestsBoardList');
       const myCompletedTableContainer = document.getElementById('myCompletedTableContainer');
       const searchFilterInput = document.getElementById('searchFilterInput');
@@ -1607,12 +1643,22 @@
         return cleanMec ? `${cleanName} (Mec. ${cleanMec})` : cleanName;
       }
 
+      function getUserRoleById(userId, fallbackRole) {
+        const found = users.find((u) => u.id === userId);
+        return (found && found.role) || fallbackRole || 'ENFERMEIRO';
+      }
+
+      function isRoleEligibleForRequest(role, req) {
+        if (!req) return true;
+        if (req.eligibility === 'ALL') return true;
+        if (req.eligibility === 'CHEFE_EQUIPA') return role === 'CHEFE_EQUIPA';
+        if (req.eligibility === 'ENF_RESPONSAVEL') return role === 'ENF_RESPONSAVEL';
+        return true;
+      }
+
       function canUserRespondToRequest(user, req) {
         if (!user) return false;
-        if (req.eligibility === 'ALL') return true;
-        if (req.eligibility === 'CHEFE_EQUIPA') return user.role === 'CHEFE_EQUIPA';
-        if (req.eligibility === 'ENF_RESPONSAVEL') return user.role === 'ENF_RESPONSAVEL';
-        return true;
+        return isRoleEligibleForRequest(user.role, req);
       }
 
       // Notificações respeitando definições pessoais do utilizador alvo
@@ -1637,10 +1683,260 @@
         saveJSON(KEYS.NOTIFS, notifications);
       }
 
+      // =====================================================================
+      // MOTOR EM BACKGROUND DE MATCH DE 3 PESSOAS (A -> B -> C -> A)
+      // =====================================================================
+      function personCanTakeShift(personId, personRole, dateISO, shiftCode, requestsPool) {
+        // Verifica se a pessoa aceita fazer (dateISO, shiftCode) num pedido aberto/pendente seu
+        const ownReq = requestsPool.find(
+          (r) =>
+            r.status !== 'MATCHED' &&
+            r.authorId === personId &&
+            Array.isArray(r.offeredShifts) &&
+            r.offeredShifts.some((o) => o.date === dateISO && o.shift === shiftCode)
+        );
+        if (ownReq) return true;
+
+        // Ou se já propôs esse turno exato num pedido aberto/pendente de outro colega
+        const proposedExact = requestsPool.some(
+          (r) =>
+            r.status !== 'MATCHED' &&
+            r.authorId !== personId &&
+            Array.isArray(r.proposals) &&
+            r.proposals.some(
+              (p) => p.userId === personId && p.offerDate === dateISO && p.offerShift === shiftCode
+            )
+        );
+        if (proposedExact) return true;
+
+        // Ou se tem um pedido aberto/pendente próprio que cede exatamente esse turno e é elegível
+        return false;
+      }
+
+      function detectThreeWayCycles() {
+        const activeReqs = swapRequests.filter((r) => r.status !== 'MATCHED' && r.authorId);
+        const foundCycles = [];
+        const seenCanonical = new Set();
+
+        for (let i = 0; i < activeReqs.length; i++) {
+          const reqA = activeReqs[i];
+          const shiftA = { date: reqA.targetDate, shift: reqA.targetShift };
+          const roleA = getUserRoleById(reqA.authorId, reqA.authorRole);
+
+          for (let j = 0; j < activeReqs.length; j++) {
+            if (i === j) continue;
+            const reqB = activeReqs[j];
+            if (reqB.authorId === reqA.authorId) continue;
+            const shiftB = { date: reqB.targetDate, shift: reqB.targetShift };
+            const roleB = getUserRoleById(reqB.authorId, reqB.authorRole);
+
+            // B tem de poder fazer o turno de A (shiftA) e respeitar elegibilidade de reqA
+            if (!isRoleEligibleForRequest(roleB, reqA)) continue;
+            if (!personCanTakeShift(reqB.authorId, roleB, shiftA.date, shiftA.shift, activeReqs)) continue;
+
+            for (let k = 0; k < activeReqs.length; k++) {
+              if (k === i || k === j) continue;
+              const reqC = activeReqs[k];
+              if (reqC.authorId === reqA.authorId || reqC.authorId === reqB.authorId) continue;
+              const shiftC = { date: reqC.targetDate, shift: reqC.targetShift };
+              const roleC = getUserRoleById(reqC.authorId, reqC.authorRole);
+
+              // C tem de poder fazer o turno de B (shiftB) e respeitar elegibilidade de reqB
+              if (!isRoleEligibleForRequest(roleC, reqB)) continue;
+              if (!personCanTakeShift(reqC.authorId, roleC, shiftB.date, shiftB.shift, activeReqs)) continue;
+
+              // A tem de poder fazer o turno de C (shiftC) e respeitar elegibilidade de reqC
+              if (!isRoleEligibleForRequest(roleA, reqC)) continue;
+              if (!personCanTakeShift(reqA.authorId, roleA, shiftC.date, shiftC.shift, activeReqs)) continue;
+
+              const cycleId = 'tri-' + [reqA.id, reqB.id, reqC.id].sort().join('__');
+              if (seenCanonical.has(cycleId)) continue;
+              seenCanonical.add(cycleId);
+
+              foundCycles.push({
+                id: cycleId,
+                personA: {
+                  userId: reqA.authorId,
+                  name: reqA.authorName,
+                  mec: reqA.authorMec,
+                  email: reqA.authorEmail,
+                  role: roleA,
+                  reqId: reqA.id,
+                  givesShift: shiftA,
+                  takesShift: shiftC
+                },
+                personB: {
+                  userId: reqB.authorId,
+                  name: reqB.authorName,
+                  mec: reqB.authorMec,
+                  email: reqB.authorEmail,
+                  role: roleB,
+                  reqId: reqB.id,
+                  givesShift: shiftB,
+                  takesShift: shiftA
+                },
+                personC: {
+                  userId: reqC.authorId,
+                  name: reqC.authorName,
+                  mec: reqC.authorMec,
+                  email: reqC.authorEmail,
+                  role: roleC,
+                  reqId: reqC.id,
+                  givesShift: shiftC,
+                  takesShift: shiftB
+                }
+              });
+            }
+          }
+        }
+
+        triangleCycles = foundCycles;
+
+        // Notifica automaticamente as 3 pessoas uma única vez por ciclo detetado
+        let addedNotif = false;
+        foundCycles.forEach((cyc) => {
+          if (notifiedCycleKeys.includes(cyc.id)) return;
+          notifiedCycleKeys.push(cyc.id);
+          addedNotif = true;
+
+          const aLabel = formatNurseIdentity(cyc.personA.name, cyc.personA.mec);
+          const bLabel = formatNurseIdentity(cyc.personB.name, cyc.personB.mec);
+          const cLabel = formatNurseIdentity(cyc.personC.name, cyc.personC.mec);
+
+          const sA = formatShiftLabel(cyc.personA.givesShift.date, cyc.personA.givesShift.shift);
+          const sB = formatShiftLabel(cyc.personB.givesShift.date, cyc.personB.givesShift.shift);
+          const sC = formatShiftLabel(cyc.personC.givesShift.date, cyc.personC.givesShift.shift);
+
+          emitNotification(
+            cyc.personA.userId,
+            'Match de troca detetado entre 3 pessoas!',
+            `Ciclo detetado: tu (${aLabel}) fazes ${sB} de ${bLabel}, ${bLabel} faz ${sC} de ${cLabel}, e ${cLabel} faz o teu turno ${sA}.`
+          );
+          emitNotification(
+            cyc.personB.userId,
+            'Match de troca detetado entre 3 pessoas!',
+            `Ciclo detetado: tu (${bLabel}) fazes ${sC} de ${cLabel}, ${cLabel} faz ${sA} de ${aLabel}, e ${aLabel} faz o teu turno ${sB}.`
+          );
+          emitNotification(
+            cyc.personC.userId,
+            'Match de troca detetado entre 3 pessoas!',
+            `Ciclo detetado: tu (${cLabel}) fazes ${sA} de ${aLabel}, ${aLabel} faz ${sB} de ${bLabel}, e ${bLabel} faz o teu turno ${sC}.`
+          );
+        });
+
+        if (addedNotif) {
+          saveJSON(KEYS.NOTIFIED_CYCLES, notifiedCycleKeys);
+          saveJSON(KEYS.NOTIFS, notifications);
+        }
+      }
+
+      window.confirmThreeWayCycle = function (cycleId) {
+        const cyc = triangleCycles.find((c) => c.id === cycleId);
+        if (!cyc) return;
+
+        const reqA = swapRequests.find((r) => r.id === cyc.personA.reqId);
+        const reqB = swapRequests.find((r) => r.id === cyc.personB.reqId);
+        const reqC = swapRequests.find((r) => r.id === cyc.personC.reqId);
+        if (!reqA || !reqB || !reqC) return;
+
+        const sA = formatShiftLabel(cyc.personA.givesShift.date, cyc.personA.givesShift.shift);
+        const sB = formatShiftLabel(cyc.personB.givesShift.date, cyc.personB.givesShift.shift);
+        const sC = formatShiftLabel(cyc.personC.givesShift.date, cyc.personC.givesShift.shift);
+
+        reqA.status = 'MATCHED';
+        reqA.matchedWith = {
+          userId: cyc.personC.userId,
+          name: cyc.personC.name,
+          mec: cyc.personC.mec,
+          email: cyc.personC.email,
+          role: cyc.personC.role,
+          exchangedShift: `${sB} (ciclo de 3: ${formatNurseIdentity(cyc.personA.name, cyc.personA.mec)} → ${formatNurseIdentity(cyc.personB.name, cyc.personB.mec)} → ${formatNurseIdentity(cyc.personC.name, cyc.personC.mec)})`
+        };
+
+        reqB.status = 'MATCHED';
+        reqB.matchedWith = {
+          userId: cyc.personA.userId,
+          name: cyc.personA.name,
+          mec: cyc.personA.mec,
+          email: cyc.personA.email,
+          role: cyc.personA.role,
+          exchangedShift: `${sC} (ciclo de 3: ${formatNurseIdentity(cyc.personA.name, cyc.personA.mec)} → ${formatNurseIdentity(cyc.personB.name, cyc.personB.mec)} → ${formatNurseIdentity(cyc.personC.name, cyc.personC.mec)})`
+        };
+
+        reqC.status = 'MATCHED';
+        reqC.matchedWith = {
+          userId: cyc.personB.userId,
+          name: cyc.personB.name,
+          mec: cyc.personB.mec,
+          email: cyc.personB.email,
+          role: cyc.personB.role,
+          exchangedShift: `${sA} (ciclo de 3: ${formatNurseIdentity(cyc.personA.name, cyc.personA.mec)} → ${formatNurseIdentity(cyc.personB.name, cyc.personB.mec)} → ${formatNurseIdentity(cyc.personC.name, cyc.personC.mec)})`
+        };
+
+        const aLabel = formatNurseIdentity(cyc.personA.name, cyc.personA.mec);
+        const bLabel = formatNurseIdentity(cyc.personB.name, cyc.personB.mec);
+        const cLabel = formatNurseIdentity(cyc.personC.name, cyc.personC.mec);
+        const summary = `Ciclo concluído: ${aLabel} (${sA}) · ${bLabel} (${sB}) · ${cLabel} (${sC}).`;
+
+        emitNotification(cyc.personA.userId, 'Troca de 3 pessoas concluída!', summary);
+        emitNotification(cyc.personB.userId, 'Troca de 3 pessoas concluída!', summary);
+        emitNotification(cyc.personC.userId, 'Troca de 3 pessoas concluída!', summary);
+
+        persistAll(true);
+        renderAll();
+        showToast('Troca de 3 pessoas confirmada e notificada aos 3 intervenientes!', 'success');
+      };
+
+      function renderTriangleMatches() {
+        if (!triangleCycles || triangleCycles.length === 0) {
+          triangleMatchesSection.classList.add('hidden');
+          triangleMatchesList.innerHTML = '';
+          return;
+        }
+
+        triangleMatchesSection.classList.remove('hidden');
+        triangleMatchesList.innerHTML = triangleCycles
+          .map((cyc) => {
+            const aLabel = formatNurseIdentity(cyc.personA.name, cyc.personA.mec);
+            const bLabel = formatNurseIdentity(cyc.personB.name, cyc.personB.mec);
+            const cLabel = formatNurseIdentity(cyc.personC.name, cyc.personC.mec);
+
+            const sA = formatShiftLabel(cyc.personA.givesShift.date, cyc.personA.givesShift.shift);
+            const sB = formatShiftLabel(cyc.personB.givesShift.date, cyc.personB.givesShift.shift);
+            const sC = formatShiftLabel(cyc.personC.givesShift.date, cyc.personC.givesShift.shift);
+
+            const isMember =
+              currentUser &&
+              (currentUser.id === cyc.personA.userId ||
+                currentUser.id === cyc.personB.userId ||
+                currentUser.id === cyc.personC.userId);
+
+            return `
+              <div class="triangle-item">
+                <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px;">
+                  <span class="badge status-matched">Match de 3 Pessoas</span>
+                  ${
+                    isMember
+                      ? `<button type="button" class="btn btn-primary btn-sm" onclick="confirmThreeWayCycle('${escapeHTML(cyc.id)}')">Confirmar ciclo de 3 pessoas</button>`
+                      : ''
+                  }
+                </div>
+                <div style="margin-top:6px; color:#1f1418; line-height:1.5;">
+                  <div>• <strong>${escapeHTML(bLabel)}</strong> pode fazer o turno de <strong>${escapeHTML(aLabel)}</strong> (${escapeHTML(sA)})</div>
+                  <div>• <strong>${escapeHTML(cLabel)}</strong> pode fazer o turno de <strong>${escapeHTML(bLabel)}</strong> (${escapeHTML(sB)})</div>
+                  <div>• <strong>${escapeHTML(aLabel)}</strong> pode fazer o turno de <strong>${escapeHTML(cLabel)}</strong> (${escapeHTML(sC)})</div>
+                </div>
+              </div>
+            `;
+          })
+          .join('');
+      }
+
       function persistAll(notifyRemote) {
         saveJSON(KEYS.USERS, users);
         saveJSON(KEYS.REQUESTS, swapRequests);
         saveJSON(KEYS.NOTIFS, notifications);
+        saveJSON(KEYS.NOTIFIED_CYCLES, notifiedCycleKeys);
         if (currentUser) {
           const fresh = users.find((u) => u.id === currentUser.id);
           if (fresh) {
@@ -1719,7 +2015,6 @@
 
         let user = users.find((u) => u.email.toLowerCase() === emailVal);
         if (!user) {
-          // Permite entrar diretamente com qualquer e-mail à escolha criando perfil rápido
           const derivedName = emailVal.split('@')[0].replace(/[._-]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
           const randomMec = String(Math.floor(7000 + Math.random() * 2900));
           user = {
@@ -2027,6 +2322,7 @@
         draftOffers = [];
         requestNotesInput.value = '';
         renderDraftOffers();
+        detectThreeWayCycles();
         persistAll(true);
         renderAll();
         showToast('Pedido de troca publicado no quadro.', 'success');
@@ -2057,7 +2353,7 @@
         const opts = req.offeredShifts.map((o) => {
           const info = SHIFT_INFO[o.shift] || SHIFT_INFO.M;
           const label = `${formatDatePT(o.date)} · ${info.code} (${info.schedule})`;
-          return `<option value="${escapeHTML(label)}">${escapeHTML(label)}</option>`;
+          return `<option value="${escapeHTML(label)}" data-date="${escapeHTML(o.date)}" data-shift="${escapeHTML(o.shift)}">${escapeHTML(label)}</option>`;
         });
         opts.push(`<option value="CUSTOM">Outro dia / turno alternativo...</option>`);
         proposeOfferSelect.innerHTML = opts.join('');
@@ -2094,6 +2390,9 @@
         if (!req) return;
 
         let chosenOffer = proposeOfferSelect.value;
+        let offerDate = '';
+        let offerShift = '';
+
         if (chosenOffer === 'CUSTOM') {
           const cDate = customOfferDateInput.value;
           const cShift = customOfferShiftInput.value;
@@ -2103,6 +2402,12 @@
           }
           const cInfo = SHIFT_INFO[cShift] || SHIFT_INFO.M;
           chosenOffer = `${formatDatePT(cDate)} · ${cInfo.code} (${cInfo.schedule})`;
+          offerDate = cDate;
+          offerShift = cShift;
+        } else {
+          const selectedOpt = proposeOfferSelect.options[proposeOfferSelect.selectedIndex];
+          offerDate = (selectedOpt && selectedOpt.getAttribute('data-date')) || '';
+          offerShift = (selectedOpt && selectedOpt.getAttribute('data-shift')) || '';
         }
 
         const proposal = {
@@ -2113,6 +2418,8 @@
           email: currentUser.email,
           role: currentUser.role,
           exchangedShift: chosenOffer,
+          offerDate,
+          offerShift,
           note: proposeNoteInput.value.trim()
         };
 
@@ -2127,6 +2434,7 @@
           `${formatNurseIdentity(currentUser.name, currentUser.mec)} propôs troca para ${formatDatePT(req.targetDate)} (${req.targetShift}) com ${chosenOffer}.`
         );
 
+        detectThreeWayCycles();
         persistAll(true);
         closeProposeModal();
         renderAll();
@@ -2163,6 +2471,7 @@
           `A tua proposta de troca com ${formatNurseIdentity(req.authorName, req.authorMec)} foi confirmada: ${matchSummary}.`
         );
 
+        detectThreeWayCycles();
         persistAll(true);
         renderAll();
         showToast('Troca confirmada e match registado!', 'success');
@@ -2170,6 +2479,7 @@
 
       window.deleteSwapRequest = function (reqId) {
         swapRequests = swapRequests.filter((r) => r.id !== reqId);
+        detectThreeWayCycles();
         persistAll(true);
         renderAll();
         showToast('Pedido removido do quadro.', 'info');
@@ -2223,6 +2533,8 @@
       });
 
       function renderBoard() {
+        renderTriangleMatches();
+
         const list = swapRequests.filter((req) => {
           if (activeFilters.shift !== 'ALL') {
             const matchTarget = req.targetShift === activeFilters.shift;
@@ -2514,6 +2826,7 @@ function doPost(e) {
           notifications = payload.notifications;
           saveJSON(KEYS.NOTIFS, notifications);
         }
+        detectThreeWayCycles();
       }
 
       async function pullRemoteState(silent) {
@@ -2610,6 +2923,7 @@ function doPost(e) {
         }
         if (syncConfig.mode !== 'LOCAL' && syncConfig.url.trim() && Number(syncConfig.intervalMs) > 0) {
           pollTimer = setInterval(() => {
+            detectThreeWayCycles();
             pullRemoteState(true);
           }, Number(syncConfig.intervalMs));
         }
@@ -2669,6 +2983,8 @@ function doPost(e) {
           swapRequests = loadJSON(KEYS.REQUESTS, swapRequests);
           notifications = loadJSON(KEYS.NOTIFS, notifications);
           users = loadJSON(KEYS.USERS, users);
+          notifiedCycleKeys = loadJSON(KEYS.NOTIFIED_CYCLES, notifiedCycleKeys);
+          detectThreeWayCycles();
           renderAll();
         };
       }
@@ -2678,6 +2994,8 @@ function doPost(e) {
           swapRequests = loadJSON(KEYS.REQUESTS, swapRequests);
           notifications = loadJSON(KEYS.NOTIFS, notifications);
           users = loadJSON(KEYS.USERS, users);
+          notifiedCycleKeys = loadJSON(KEYS.NOTIFIED_CYCLES, notifiedCycleKeys);
+          detectThreeWayCycles();
           renderAll();
         }
       });
@@ -2722,6 +3040,7 @@ function doPost(e) {
       renderDraftOffers();
       updateSyncIndicator('local', syncConfig.mode === 'LOCAL' ? 'Sincronização: Local' : `Ao vivo · ${syncConfig.mode}`);
       setupPolling();
+      detectThreeWayCycles();
       renderAll();
       if (syncConfig.mode !== 'LOCAL' && syncConfig.url.trim()) {
         pullRemoteState(true);
