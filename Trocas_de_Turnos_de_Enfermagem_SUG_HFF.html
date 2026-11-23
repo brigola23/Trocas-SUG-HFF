@@ -1,0 +1,2732 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trocas de Turnos de Enfermagem SUG HFF</title>
+  <style>
+    /* =======================================================================
+       TEMA CLARO FORÇADO E PALETA BORDEAUX (ULS AMADORA/SINTRA · SUG HFF)
+       ======================================================================= */
+    :root {
+      color-scheme: light !important;
+      --bdx: #6b1d2f;
+      --bdx-dark: #4d1321;
+      --bdx-light: #8a2840;
+      --bdx-soft: #f9e4e8;
+      --bdx-tint: #fdf2f4;
+      --bg-page: #fdf2f4;
+      --bg-card: #ffffff;
+      --bg-muted: #f7ecef;
+      --text-main: #1f1418;
+      --text-sub: #5c434a;
+      --text-muted: #7a5c64;
+      --border: #e8cdd3;
+      --border-strong: #d3aab4;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 16px rgba(77, 19, 33, 0.06);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      color-scheme: light !important;
+      background-color: #fdf2f4 !important;
+      color: #1f1418 !important;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* =======================================================================
+       CABEÇALHO E EMBLEMA INSTITUCIONAL
+       ======================================================================= */
+    .topbar {
+      background-color: #ffffff !important;
+      border-bottom: 2px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      box-shadow: 0 2px 10px rgba(77, 19, 33, 0.05);
+    }
+
+    .topbar-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1 1 300px;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--bdx-dark) !important;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-sub {
+      margin: 2px 0 0;
+      font-size: 0.78rem;
+      color: var(--text-sub) !important;
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* =======================================================================
+       BOTÕES E CRACHÁS
+       ======================================================================= */
+    button, input, select, textarea {
+      font-family: inherit;
+      color-scheme: light !important;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 700;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+      background-color: #ffffff;
+      color: var(--text-main);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--bdx) !important;
+      color: #ffffff !important;
+      border-color: var(--bdx-dark);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--bdx-light) !important;
+    }
+
+    .btn-secondary {
+      background-color: var(--bdx-soft) !important;
+      color: var(--bdx-dark) !important;
+      border-color: var(--border-strong);
+    }
+
+    .btn-secondary:hover {
+      background-color: #f3d4da !important;
+    }
+
+    .btn-outline {
+      background-color: #ffffff !important;
+      color: var(--text-main) !important;
+      border-color: var(--border-strong);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--bg-muted) !important;
+    }
+
+    .btn-danger-outline {
+      background-color: #ffffff !important;
+      color: #991b1b !important;
+      border-color: #fca5a5;
+    }
+
+    .btn-danger-outline:hover {
+      background-color: #fef2f2 !important;
+    }
+
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 0.78rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .badge-role-enf {
+      background-color: #f3ecee;
+      color: #3b262d;
+      border-color: #d6c3c9;
+    }
+
+    .badge-role-chefe {
+      background-color: #ede9fe;
+      color: #4c1d95;
+      border-color: #c4b5fd;
+    }
+
+    .badge-role-resp {
+      background-color: #e0f2fe;
+      color: #075985;
+      border-color: #7dd3fc;
+    }
+
+    .shift-pill-M {
+      background-color: #fef3c7;
+      color: #78350f;
+      border-color: #fcd34d;
+    }
+
+    .shift-pill-T {
+      background-color: #e0f2fe;
+      color: #0c4a6e;
+      border-color: #7dd3fc;
+    }
+
+    .shift-pill-N {
+      background-color: #e0e7ff;
+      color: #312e81;
+      border-color: #a5b4fc;
+    }
+
+    .status-open {
+      background-color: var(--bdx-soft);
+      color: var(--bdx-dark);
+      border-color: var(--border-strong);
+    }
+
+    .status-pending {
+      background-color: #fef3c7;
+      color: #92400e;
+      border-color: #fbbf24;
+    }
+
+    .status-matched {
+      background-color: #dcfce7;
+      color: #166534;
+      border-color: #86efac;
+    }
+
+    .count-dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background-color: var(--bdx);
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 800;
+    }
+
+    /* =======================================================================
+       FAIXA DE BOAS-VINDAS, ESTATÍSTICAS E GRELCAS
+       ======================================================================= */
+    .main-wrap {
+      padding: 20px 0 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .banner-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f9e4e8 100%) !important;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .schedule-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+    }
+
+    .stat-card {
+      background-color: var(--bg-card) !important;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-label {
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-sub);
+    }
+
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--bdx-dark);
+      margin: 4px 0 2px;
+    }
+
+    .stat-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (min-width: 960px) {
+      .workspace-grid {
+        grid-template-columns: 420px minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background-color: var(--bg-card) !important;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .card-sub {
+      margin: 4px 0 0;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    /* =======================================================================
+       FORMULÁRIOS E CAIXAS INTERNAS
+       ======================================================================= */
+    .form-section {
+      background-color: var(--bg-muted) !important;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 13px;
+      margin-top: 12px;
+    }
+
+    .section-kicker {
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--bdx-dark);
+      margin-bottom: 10px;
+    }
+
+    .field-group {
+      margin-bottom: 11px;
+    }
+
+    .field-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 9px 11px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background-color: #ffffff !important;
+      color: #1f1418 !important;
+      font-size: 0.86rem;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: 2px solid var(--bdx);
+      outline-offset: 1px;
+      border-color: var(--bdx);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    @media (min-width: 520px) {
+      .grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    @media (min-width: 520px) {
+      .grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .shift-choice-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .shift-choice-btn {
+      padding: 8px 6px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background-color: #ffffff !important;
+      color: var(--text-main) !important;
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .shift-choice-btn.active-M {
+      background-color: #fef3c7 !important;
+      color: #78350f !important;
+      border-color: #d97706;
+      box-shadow: inset 0 0 0 1px #d97706;
+    }
+
+    .shift-choice-btn.active-T {
+      background-color: #e0f2fe !important;
+      color: #0c4a6e !important;
+      border-color: #0284c7;
+      box-shadow: inset 0 0 0 1px #0284c7;
+    }
+
+    .shift-choice-btn.active-N {
+      background-color: #e0e7ff !important;
+      color: #312e81 !important;
+      border-color: #4f46e5;
+      box-shadow: inset 0 0 0 1px #4f46e5;
+    }
+
+    .offer-chip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background-color: #ffffff !important;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 7px 10px;
+      font-size: 0.8rem;
+      margin-top: 7px;
+    }
+
+    /* =======================================================================
+       CARTÕES DE PEDIDOS E PROPOSTAS
+       ======================================================================= */
+    .filter-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .filter-pill {
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background-color: #ffffff !important;
+      color: var(--text-main) !important;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .filter-pill.active {
+      background-color: var(--bdx) !important;
+      color: #ffffff !important;
+      border-color: var(--bdx-dark);
+    }
+
+    .requests-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .swap-card {
+      background-color: #ffffff !important;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .swap-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .swap-author-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .swap-author-name {
+      font-weight: 800;
+      font-size: 0.98rem;
+      color: var(--text-main);
+    }
+
+    .swap-exchange-box {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      background-color: var(--bg-muted) !important;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      margin-top: 12px;
+    }
+
+    @media (min-width: 640px) {
+      .swap-exchange-box {
+        grid-template-columns: 1fr 1.35fr;
+      }
+    }
+
+    .offered-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 5px;
+    }
+
+    .offered-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #ffffff !important;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .proposals-box {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border-strong);
+    }
+
+    .proposal-item {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background-color: var(--bdx-tint) !important;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 9px 11px;
+      font-size: 0.8rem;
+      margin-top: 7px;
+    }
+
+    .swap-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 11px;
+      border-top: 1px solid var(--border);
+    }
+
+    .swap-actions-left {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* =======================================================================
+       TABELA INDIVIDUAL DE TROCAS CONCLUÍDAS
+       ======================================================================= */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background-color: #ffffff !important;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      background-color: var(--bg-muted) !important;
+      color: var(--bdx-dark) !important;
+      font-weight: 800;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* =======================================================================
+       TOAST E MODAIS
+       ======================================================================= */
+    .toast {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      left: 18px;
+      max-width: 460px;
+      margin-left: auto;
+      z-index: 80;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.84rem;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.16);
+      border: 1px solid transparent;
+    }
+
+    .toast-success {
+      background-color: #14532d !important;
+      color: #ffffff !important;
+      border-color: #166534;
+    }
+
+    .toast-error {
+      background-color: #7f1d1d !important;
+      color: #ffffff !important;
+      border-color: #991b1b;
+    }
+
+    .toast-info {
+      background-color: var(--bdx-dark) !important;
+      color: #ffffff !important;
+      border-color: var(--bdx);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background-color: rgba(31, 20, 24, 0.58);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background-color: #ffffff !important;
+      color: var(--text-main) !important;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 540px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 20px;
+      box-shadow: 0 20px 45px rgba(31, 20, 24, 0.25);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .notif-item {
+      padding: 11px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background-color: #ffffff !important;
+      margin-bottom: 8px;
+      font-size: 0.82rem;
+    }
+
+    .notif-item.unread {
+      background-color: var(--bdx-tint) !important;
+      border-color: var(--bdx);
+    }
+
+    .code-box {
+      background-color: #26171b !important;
+      color: #fdf2f4 !important;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.72rem;
+      overflow-x: auto;
+      white-space: pre;
+      margin-top: 8px;
+    }
+
+    .site-footer {
+      background-color: #ffffff !important;
+      border-top: 1px solid var(--border);
+      padding: 14px 0;
+      margin-top: 16px;
+      font-size: 0.78rem;
+      color: var(--text-sub);
+    }
+  </style>
+</head>
+<body>
+  <!-- =====================================================================
+       CABEÇALHO PRINCIPAL
+       ===================================================================== -->
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand">
+        <!-- Emblema ULS Amadora/Sintra · Hospital Dr. Fernando Fonseca -->
+        <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Emblema ULS Amadora/Sintra Hospital Dr. Fernando Fonseca">
+          <rect width="44" height="44" rx="12" fill="#6b1d2f" />
+          <circle cx="22" cy="22" r="16.5" stroke="#f9e4e8" stroke-width="1.4" stroke-dasharray="2.5 2" />
+          <rect x="19.5" y="11.5" width="5" height="21" rx="1.5" fill="#ffffff" />
+          <rect x="11.5" y="19.5" width="21" height="5" rx="1.5" fill="#ffffff" />
+          <circle cx="22" cy="22" r="2.7" fill="#e6b8c2" />
+        </svg>
+        <div>
+          <h1 class="brand-title">Trocas de Turnos de Enfermagem SUG HFF</h1>
+          <p class="brand-sub">ULS Amadora/Sintra · Hospital Dr. Fernando Fonseca · Serviço de Urgência Geral</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" id="openSyncBtn" class="btn btn-outline btn-sm">
+          <span id="syncDot" style="width:8px; height:8px; border-radius:999px; background:#16a34a; display:inline-block;"></span>
+          <span id="syncStatusText">Sincronização: Local</span>
+        </button>
+
+        <button type="button" id="openNotifBtn" class="btn btn-outline btn-sm">
+          <span>Notificações</span>
+          <span id="unreadCountBadge" class="count-dot hidden">0</span>
+        </button>
+
+        <button type="button" id="openPrefsBtn" class="btn btn-outline btn-sm hidden">
+          Definições pessoais
+        </button>
+
+        <div id="authLoggedOutBox">
+          <button type="button" id="openAuthBtn" class="btn btn-primary btn-sm">
+            Iniciar Sessão / Registar
+          </button>
+        </div>
+
+        <div id="authLoggedInBox" class="hidden" style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+          <span id="userSummaryBadge" class="badge badge-role-enf"></span>
+          <button type="button" id="logoutBtn" class="btn btn-outline btn-sm">Sair</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- =====================================================================
+       CONTEÚDO PRINCIPAL
+       ===================================================================== -->
+  <main class="container main-wrap">
+    <!-- Banner Institucional e Horários Oficiais -->
+    <section class="banner-card" aria-label="Informações do Serviço de Urgência Geral">
+      <div style="max-width:720px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <span class="badge status-open">ULS Amadora/Sintra · Hospital Dr. Fernando Fonseca</span>
+          <span class="badge badge-role-enf">SUG HFF</span>
+        </div>
+        <h2 style="margin:8px 0 4px; font-size:1.15rem; font-weight:800; color:#4d1321;">
+          Coordenação rápida de trocas de turnos sem mensagens soltas no grupo
+        </h2>
+        <p style="margin:0; font-size:0.84rem; color:#5c434a;">
+          Escolhe o dia e o turno que pretendes ceder (<strong>M</strong>, <strong>T</strong> ou <strong>N</strong>), indica os turnos de outros dias que aceitas fazer em troca e recebe notificações quando houver match.
+        </p>
+        <div class="schedule-strip">
+          <span class="badge shift-pill-M">M · Manhã (08h00 – 15h30)</span>
+          <span class="badge shift-pill-T">T · Tarde (15h00 – 22h30)</span>
+          <span class="badge shift-pill-N">N · Noite (22h00 – 08h30)</span>
+        </div>
+      </div>
+      <div id="bannerSessionNotice" style="font-size:0.8rem; font-weight:600; color:#4d1321; background:#ffffff; border:1px solid #e8cdd3; padding:10px 14px; border-radius:12px;">
+        Podes entrar com qualquer e-mail à tua escolha ou usar um perfil de demonstração.
+      </div>
+    </section>
+
+    <!-- Indicadores Resumo -->
+    <section class="stats-grid" aria-label="Resumo do quadro">
+      <div class="stat-card">
+        <div class="stat-label">Pedidos Abertos</div>
+        <div id="statOpen" class="stat-value">0</div>
+        <div class="stat-desc">Disponíveis para propôr troca</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Em Análise / Pendentes</div>
+        <div id="statPending" class="stat-value">0</div>
+        <div class="stat-desc">Com proposta enviada a aguardar confirmação</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">As Minhas Trocas Concluídas</div>
+        <div id="statMineMatched" class="stat-value">0</div>
+        <div class="stat-desc">Trocas confirmadas em que participas</div>
+      </div>
+    </section>
+
+    <!-- Coluna Esquerda: Criar Pedido | Coluna Direita: Quadro de Pedidos -->
+    <div class="workspace-grid">
+      <!-- Formulário de Novo Pedido de Troca -->
+      <section class="card" aria-labelledby="newRequestHeading">
+        <h2 id="newRequestHeading" class="card-title">Novo Pedido de Troca</h2>
+        <p class="card-sub">Define o turno que queres ceder, os turnos alternativos que aceitas e o posto elegível.</p>
+
+        <form id="createRequestForm" style="margin-top:10px;">
+          <!-- 1. Turno a Ceder -->
+          <div class="form-section">
+            <div class="section-kicker">1. Dia e Turno que Pretendes Ceder</div>
+            <div class="grid-2">
+              <div class="field-group">
+                <label for="targetDateInput">Dia do turno a ceder</label>
+                <input type="date" id="targetDateInput" required />
+              </div>
+              <div class="field-group">
+                <label>Turno (M / T / N)</label>
+                <div class="shift-choice-row" role="radiogroup" aria-label="Turno a ceder">
+                  <button type="button" class="shift-choice-btn active-M" data-target-shift="M">M</button>
+                  <button type="button" class="shift-choice-btn" data-target-shift="T">T</button>
+                  <button type="button" class="shift-choice-btn" data-target-shift="N">N</button>
+                </div>
+                <input type="hidden" id="targetShiftInput" value="M" />
+              </div>
+            </div>
+            <div id="targetShiftScheduleHint" style="font-size:0.76rem; color:#5c434a; margin-top:6px; font-weight:600;">
+              Horário selecionado: 08h00 – 15h30 (Manhã)
+            </div>
+          </div>
+
+          <!-- 2. Turnos Alternativos Aceites em Troca -->
+          <div class="form-section">
+            <div class="section-kicker">2. Turnos de Outros Dias Aceites em Troca</div>
+            <div class="grid-3" style="align-items:end;">
+              <div class="field-group">
+                <label for="altOfferDateInput">Dia disponível</label>
+                <input type="date" id="altOfferDateInput" />
+              </div>
+              <div class="field-group">
+                <label for="altOfferShiftInput">Turno</label>
+                <select id="altOfferShiftInput">
+                  <option value="M">M (08h00–15h30)</option>
+                  <option value="T">T (15h00–22h30)</option>
+                  <option value="N">N (22h00–08h30)</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <button type="button" id="addAltOfferBtn" class="btn btn-secondary" style="width:100%;">
+                  + Adicionar
+                </button>
+              </div>
+            </div>
+            <div id="draftOffersList"></div>
+          </div>
+
+          <!-- 3. Elegibilidade de Posto -->
+          <div class="form-section">
+            <div class="section-kicker">3. Elegibilidade / Posto Exigido</div>
+            <div class="field-group">
+              <label for="eligibilitySelect">Quem pode responder a este pedido?</label>
+              <select id="eligibilitySelect">
+                <option value="ALL">Todos os postos (equipa geral)</option>
+                <option value="CHEFE_EQUIPA">Exclusivo Chefe de Equipa</option>
+                <option value="ENF_RESPONSAVEL">Exclusivo Enf. Responsável</option>
+              </select>
+              <p style="margin:6px 0 0; font-size:0.74rem; color:#5c434a;">
+                Nota: <strong>Chefe de Equipa</strong> e <strong>Enf. Responsável</strong> são postos distintos e podem trocar entre si e também com todos os restantes enfermeiros da equipa.
+              </p>
+            </div>
+          </div>
+
+          <!-- Observações -->
+          <div class="field-group" style="margin-top:12px;">
+            <label for="requestNotesInput">Observações (opcional)</label>
+            <input type="text" id="requestNotesInput" placeholder="Ex.: Posso dividir ou ajustar horário conforme escala" />
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%; margin-top:12px; padding:11px 14px;">
+            Publicar Pedido de Troca
+          </button>
+        </form>
+      </section>
+
+      <!-- Coluna Direita: Quadro de Pedidos + Tabela Individual de Trocas Concluídas -->
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        <section class="card" aria-labelledby="boardHeading">
+          <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px;">
+            <div>
+              <h2 id="boardHeading" class="card-title">Quadro de Pedidos de Troca</h2>
+              <p class="card-sub">Filtra por turno, estado ou posto exclusivo e propõe uma troca.</p>
+            </div>
+            <button type="button" id="resetFiltersBtn" class="btn btn-outline btn-sm">Limpar filtros</button>
+          </div>
+
+          <div class="filter-bar">
+            <input type="text" id="searchFilterInput" placeholder="Pesquisar por nome, n.º mecanográfico, data ou observações..." />
+
+            <div class="filter-pills" aria-label="Filtro por turno">
+              <button type="button" class="filter-pill active" data-filter-shift="ALL">Todos os turnos</button>
+              <button type="button" class="filter-pill" data-filter-shift="M">M (08h00–15h30)</button>
+              <button type="button" class="filter-pill" data-filter-shift="T">T (15h00–22h30)</button>
+              <button type="button" class="filter-pill" data-filter-shift="N">N (22h00–08h30)</button>
+            </div>
+
+            <div class="filter-pills" aria-label="Filtro por estado e posto">
+              <button type="button" class="filter-pill active" data-filter-status="ALL">Todos os estados</button>
+              <button type="button" class="filter-pill" data-filter-status="OPEN">Abertos</button>
+              <button type="button" class="filter-pill" data-filter-status="PENDING">Pendentes</button>
+              <button type="button" class="filter-pill" data-filter-status="MATCHED">Concluídos</button>
+              <button type="button" class="filter-pill" data-filter-elig="CHEFE_EQUIPA">Exclusivo Chefe de Equipa</button>
+              <button type="button" class="filter-pill" data-filter-elig="ENF_RESPONSAVEL">Exclusivo Enf. Responsável</button>
+            </div>
+          </div>
+
+          <div id="requestsBoardList" class="requests-stack"></div>
+        </section>
+
+        <!-- Tabela Individual Exclusiva de Trocas Concluídas -->
+        <section class="card" aria-labelledby="myCompletedHeading">
+          <h2 id="myCompletedHeading" class="card-title">A Minha Tabela de Trocas Concluídas</h2>
+          <p class="card-sub">
+            Mostra exclusivamente as trocas concluídas em que participas (nunca as trocas de toda a equipa).
+          </p>
+          <div id="myCompletedTableContainer" class="table-wrap"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Rodapé -->
+  <footer class="site-footer">
+    <div class="container" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px;">
+      <span><strong>Trocas de Turnos de Enfermagem SUG HFF</strong> · ULS Amadora/Sintra · Hospital Dr. Fernando Fonseca</span>
+      <span>M: 08h00–15h30 · T: 15h00–22h30 · N: 22h00–08h30</span>
+    </div>
+  </footer>
+
+  <!-- =====================================================================
+       MODAL 1: INICIAR SESSÃO / REGISTAR (QUALQUER E-MAIL + DEMO)
+       ===================================================================== -->
+  <div id="authModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <svg width="34" height="34" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="44" height="44" rx="11" fill="#6b1d2f" />
+            <rect x="19.5" y="11.5" width="5" height="21" rx="1.5" fill="#ffffff" />
+            <rect x="11.5" y="19.5" width="21" height="5" rx="1.5" fill="#ffffff" />
+          </svg>
+          <div>
+            <h3 id="authModalTitle" style="margin:0; font-size:1rem; font-weight:800;">Acesso à Plataforma · SUG HFF</h3>
+            <p style="margin:2px 0 0; font-size:0.76rem; color:#5c434a;">
+              Podes usar qualquer e-mail à tua escolha (ex.: @gmail.com, @hotmail.com, @outlook.com) ou entrar num perfil de teste.
+            </p>
+          </div>
+        </div>
+        <button type="button" id="closeAuthModalBtn" class="btn btn-outline btn-sm" aria-label="Fechar">✕</button>
+      </div>
+
+      <!-- Acesso Rápido de Demonstração -->
+      <div class="form-section" style="margin-top:0; margin-bottom:14px;">
+        <div class="section-kicker">Acesso Rápido (Perfis de Demonstração)</div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+          <button type="button" class="btn btn-secondary btn-sm demo-login-btn" data-demo-email="ana.silva@exemplo.pt">
+            Ana Rita Silva (Mec. 4821) · Chefe de Equipa
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm demo-login-btn" data-demo-email="bruno.costa@exemplo.pt">
+            Bruno Costa (Mec. 5190) · Enf. Responsável
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm demo-login-btn" data-demo-email="catarina.lopes@exemplo.pt">
+            Catarina Lopes (Mec. 6304) · Enfermeiro(a)
+          </button>
+        </div>
+      </div>
+
+      <!-- Separador Login / Registo -->
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <button type="button" id="tabLoginBtn" class="btn btn-primary btn-sm" style="flex:1;">Entrar com E-mail</button>
+        <button type="button" id="tabRegisterBtn" class="btn btn-outline btn-sm" style="flex:1;">Criar Conta Nova</button>
+      </div>
+
+      <!-- Formulário de Login -->
+      <form id="loginForm">
+        <div class="field-group">
+          <label for="loginEmailInput">E-mail (qualquer endereço à tua escolha)</label>
+          <input type="email" id="loginEmailInput" placeholder="ex.: o.teu.nome@gmail.com" required />
+        </div>
+        <div class="field-group">
+          <label for="loginPasswordInput">Palavra-passe</label>
+          <input type="password" id="loginPasswordInput" placeholder="Introduz a tua palavra-passe" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">Entrar</button>
+      </form>
+
+      <!-- Formulário de Registo -->
+      <form id="registerForm" class="hidden">
+        <div class="grid-2">
+          <div class="field-group">
+            <label for="regNameInput">Nome completo</label>
+            <input type="text" id="regNameInput" placeholder="Ex.: Mariana Ferreira" required />
+          </div>
+          <div class="field-group">
+            <label for="regMecInput">N.º mecanográfico</label>
+            <input type="text" id="regMecInput" placeholder="Ex.: 7120" required />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field-group">
+            <label for="regEmailInput">E-mail pessoal ou à escolha</label>
+            <input type="email" id="regEmailInput" placeholder="ex.: mariana.ferreira@gmail.com" required />
+          </div>
+          <div class="field-group">
+            <label for="regRoleSelect">Posto na equipa</label>
+            <select id="regRoleSelect">
+              <option value="ENFERMEIRO">Enfermeiro(a)</option>
+              <option value="CHEFE_EQUIPA">Chefe de Equipa</option>
+              <option value="ENF_RESPONSAVEL">Enf. Responsável</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field-group">
+            <label for="regNotifPrefSelect">Preferência de notificações</label>
+            <select id="regNotifPrefSelect">
+              <option value="BOTH">Ambos (plataforma e e-mail)</option>
+              <option value="PLATFORM">Na plataforma</option>
+              <option value="EMAIL">Por e-mail</option>
+              <option value="NONE">Evitar / Nenhuma</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="regPasswordInput">Palavra-passe</label>
+            <input type="password" id="regPasswordInput" placeholder="Mínimo 4 caracteres" required />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">Registar e Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 2: PROPÔR TROCA
+       ===================================================================== -->
+  <div id="proposeModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="proposeModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="proposeModalTitle" style="margin:0; font-size:1rem; font-weight:800;">Propôr Troca de Turno</h3>
+          <p id="proposeModalSubtitle" style="margin:2px 0 0; font-size:0.78rem; color:#5c434a;"></p>
+        </div>
+        <button type="button" id="closeProposeModalBtn" class="btn btn-outline btn-sm" aria-label="Fechar">✕</button>
+      </div>
+
+      <form id="proposeForm">
+        <input type="hidden" id="proposeRequestId" />
+
+        <div class="field-group">
+          <label for="proposeOfferSelect">Escolhe um turno oferecido pelo colega (ou alternativa)</label>
+          <select id="proposeOfferSelect"></select>
+        </div>
+
+        <div id="customProposeBox" class="form-section hidden">
+          <div class="section-kicker">Turno Alternativo que Propões Fazer</div>
+          <div class="grid-2">
+            <div class="field-group">
+              <label for="customOfferDateInput">Dia</label>
+              <input type="date" id="customOfferDateInput" />
+            </div>
+            <div class="field-group">
+              <label for="customOfferShiftInput">Turno</label>
+              <select id="customOfferShiftInput">
+                <option value="M">M (08h00–15h30)</option>
+                <option value="T">T (15h00–22h30)</option>
+                <option value="N">N (22h00–08h30)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group" style="margin-top:10px;">
+          <label for="proposeNoteInput">Mensagem / nota (opcional)</label>
+          <input type="text" id="proposeNoteInput" placeholder="Ex.: Posso assumir esse turno e confirmamos na escala" />
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+          <button type="button" id="cancelProposeBtn" class="btn btn-outline">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Propôr troca</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 3: DEFINIÇÕES PESSOAIS (N.º MECANOGRÁFICO, POSTO, NOTIFICAÇÕES)
+       ===================================================================== -->
+  <div id="prefsModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="prefsModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="prefsModalTitle" style="margin:0; font-size:1rem; font-weight:800;">Definições Pessoais</h3>
+          <p style="margin:2px 0 0; font-size:0.78rem; color:#5c434a;">
+            Atualiza o teu nome, n.º mecanográfico, posto e como queres receber notificações.
+          </p>
+        </div>
+        <button type="button" id="closePrefsModalBtn" class="btn btn-outline btn-sm" aria-label="Fechar">✕</button>
+      </div>
+
+      <form id="prefsForm">
+        <div class="grid-2">
+          <div class="field-group">
+            <label for="prefNameInput">Nome</label>
+            <input type="text" id="prefNameInput" required />
+          </div>
+          <div class="field-group">
+            <label for="prefMecInput">N.º mecanográfico</label>
+            <input type="text" id="prefMecInput" required />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field-group">
+            <label for="prefRoleSelect">Posto atual</label>
+            <select id="prefRoleSelect">
+              <option value="ENFERMEIRO">Enfermeiro(a)</option>
+              <option value="CHEFE_EQUIPA">Chefe de Equipa</option>
+              <option value="ENF_RESPONSAVEL">Enf. Responsável</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="prefNotifSelect">Receber notificações em</label>
+            <select id="prefNotifSelect">
+              <option value="BOTH">Ambos (plataforma e e-mail)</option>
+              <option value="PLATFORM">Na plataforma</option>
+              <option value="EMAIL">Por e-mail</option>
+              <option value="NONE">Evitar / Nenhuma</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+          <button type="button" id="cancelPrefsBtn" class="btn btn-outline">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Definições</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 4: NOTIFICAÇÕES
+       ===================================================================== -->
+  <div id="notifModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="notifModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="notifModalTitle" style="margin:0; font-size:1rem; font-weight:800;">Notificações</h3>
+          <p id="notifPrefSubtitle" style="margin:2px 0 0; font-size:0.78rem; color:#5c434a;"></p>
+        </div>
+        <button type="button" id="closeNotifModalBtn" class="btn btn-outline btn-sm" aria-label="Fechar">✕</button>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:10px;">
+        <button type="button" id="markAllReadBtn" class="btn btn-outline btn-sm">Marcar todas como lidas</button>
+      </div>
+
+      <div id="notifListContainer"></div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 5: SINCRONIZAÇÃO EM TEMPO REAL (EQUIPA)
+       ===================================================================== -->
+  <div id="syncModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="syncModalTitle">
+    <div class="modal-card" style="max-width:580px;">
+      <div class="modal-header">
+        <div>
+          <h3 id="syncModalTitle" style="margin:0; font-size:1rem; font-weight:800;">Sincronização em Tempo Real</h3>
+          <p style="margin:2px 0 0; font-size:0.78rem; color:#5c434a;">
+            Partilha o quadro com a equipa em vários dispositivos ou mantém apenas neste navegador.
+          </p>
+        </div>
+        <button type="button" id="closeSyncModalBtn" class="btn btn-outline btn-sm" aria-label="Fechar">✕</button>
+      </div>
+
+      <form id="syncForm">
+        <div class="field-group">
+          <label for="syncModeSelect">Modo de sincronização</label>
+          <select id="syncModeSelect">
+            <option value="LOCAL">Local / Este dispositivo (com BroadcastChannel entre abas)</option>
+            <option value="APPS_SCRIPT">Google Apps Script (Web App URL)</option>
+            <option value="FIREBASE_RTDB">Firebase Realtime Database</option>
+            <option value="FIRESTORE_REST">Firestore REST</option>
+          </select>
+        </div>
+
+        <div id="remoteSyncConfigBox" class="form-section hidden">
+          <div class="section-kicker">Configuração Remota Partilhada</div>
+          <div class="field-group">
+            <label for="syncUrlInput">URL do endpoint partilhado</label>
+            <input type="text" id="syncUrlInput" placeholder="Ex.: https://script.google.com/macros/s/.../exec" />
+          </div>
+          <div class="grid-2">
+            <div class="field-group">
+              <label for="syncRoomInput">Código da equipa / sala</label>
+              <input type="text" id="syncRoomInput" placeholder="SUG_HFF_GERAL" />
+            </div>
+            <div class="field-group">
+              <label for="syncIntervalInput">Intervalo automático (segundos)</label>
+              <select id="syncIntervalInput">
+                <option value="15000">15 segundos</option>
+                <option value="30000">30 segundos</option>
+                <option value="60000">60 segundos</option>
+                <option value="0">Apenas manual / ao alterar</option>
+              </select>
+            </div>
+          </div>
+          <div id="syncGuideContainer"></div>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin-top:12px;">
+          <span id="syncStatusDetail" style="font-size:0.78rem; color:#5c434a; font-weight:600;">
+            Modo ativo: Local neste dispositivo.
+          </span>
+          <button type="button" id="testSyncNowBtn" class="btn btn-secondary btn-sm">
+            Testar ligação e sincronizar agora
+          </button>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+          <button type="button" id="cancelSyncBtn" class="btn btn-outline">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar sincronização</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       JAVASCRIPT COMPLETO E AUTÓNOMO
+       ===================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      const KEYS = {
+        USERS: 'sug_hff_users_v2',
+        SESSION: 'sug_hff_session_v2',
+        REQUESTS: 'sug_hff_requests_v2',
+        NOTIFS: 'sug_hff_notifs_v2',
+        SYNC: 'sug_hff_sync_v2'
+      };
+
+      const SHIFT_INFO = {
+        M: { code: 'M', name: 'Manhã', schedule: '08h00 – 15h30', pillClass: 'shift-pill-M' },
+        T: { code: 'T', name: 'Tarde', schedule: '15h00 – 22h30', pillClass: 'shift-pill-T' },
+        N: { code: 'N', name: 'Noite', schedule: '22h00 – 08h30', pillClass: 'shift-pill-N' }
+      };
+
+      const ROLE_INFO = {
+        ENFERMEIRO: { label: 'Enfermeiro(a)', badgeClass: 'badge-role-enf' },
+        CHEFE_EQUIPA: { label: 'Chefe de Equipa', badgeClass: 'badge-role-chefe' },
+        ENF_RESPONSAVEL: { label: 'Enf. Responsável', badgeClass: 'badge-role-resp' }
+      };
+
+      const ELIGIBILITY_LABEL = {
+        ALL: 'Todos os postos (equipa geral)',
+        CHEFE_EQUIPA: 'Exclusivo Chefe de Equipa',
+        ENF_RESPONSAVEL: 'Exclusivo Enf. Responsável'
+      };
+
+      const NOTIF_PREF_LABEL = {
+        BOTH: 'Ambos (plataforma e e-mail)',
+        PLATFORM: 'Na plataforma',
+        EMAIL: 'Por e-mail',
+        NONE: 'Evitar / Nenhuma'
+      };
+
+      function offsetDateISO(days) {
+        const d = new Date();
+        d.setHours(12, 0, 0, 0);
+        d.setDate(d.getDate() + days);
+        return d.toISOString().split('T')[0];
+      }
+
+      function formatDatePT(iso) {
+        if (!iso) return 'Data a definir';
+        const parts = iso.split('-');
+        if (parts.length !== 3) return iso;
+        const dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        if (Number.isNaN(dt.getTime())) return iso;
+        return dt.toLocaleDateString('pt-PT', { weekday: 'short', day: '2-digit', month: 'short' });
+      }
+
+      function escapeHTML(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function loadJSON(key, fallback) {
+        try {
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch (e) {
+          return fallback;
+        }
+      }
+
+      function saveJSON(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch (e) {
+          // Ignora limitações de armazenamento
+        }
+      }
+
+      const seedUsers = [
+        {
+          id: 'u-ana',
+          name: 'Ana Rita Silva',
+          mec: '4821',
+          email: 'ana.silva@exemplo.pt',
+          password: 'demo',
+          role: 'CHEFE_EQUIPA',
+          notifPref: 'BOTH'
+        },
+        {
+          id: 'u-bruno',
+          name: 'Bruno Costa',
+          mec: '5190',
+          email: 'bruno.costa@exemplo.pt',
+          password: 'demo',
+          role: 'ENF_RESPONSAVEL',
+          notifPref: 'BOTH'
+        },
+        {
+          id: 'u-catarina',
+          name: 'Catarina Lopes',
+          mec: '6304',
+          email: 'catarina.lopes@exemplo.pt',
+          password: 'demo',
+          role: 'ENFERMEIRO',
+          notifPref: 'PLATFORM'
+        }
+      ];
+
+      const seedRequests = [
+        {
+          id: 'req-1',
+          authorId: 'u-ana',
+          authorName: 'Ana Rita Silva',
+          authorMec: '4821',
+          authorEmail: 'ana.silva@exemplo.pt',
+          authorRole: 'CHEFE_EQUIPA',
+          targetDate: offsetDateISO(2),
+          targetShift: 'M',
+          offeredShifts: [
+            { date: offsetDateISO(4), shift: 'T' },
+            { date: offsetDateISO(6), shift: 'M' }
+          ],
+          eligibility: 'ALL',
+          notes: 'Disponível para troca com qualquer colega ou posto.',
+          status: 'OPEN',
+          proposals: [],
+          matchedWith: null
+        },
+        {
+          id: 'req-2',
+          authorId: 'u-bruno',
+          authorName: 'Bruno Costa',
+          authorMec: '5190',
+          authorEmail: 'bruno.costa@exemplo.pt',
+          authorRole: 'ENF_RESPONSAVEL',
+          targetDate: offsetDateISO(3),
+          targetShift: 'N',
+          offeredShifts: [
+            { date: offsetDateISO(5), shift: 'M' }
+          ],
+          eligibility: 'ENF_RESPONSAVEL',
+          notes: 'Pedido exclusivo para o posto de Enf. Responsável.',
+          status: 'OPEN',
+          proposals: [],
+          matchedWith: null
+        },
+        {
+          id: 'req-3',
+          authorId: 'u-catarina',
+          authorName: 'Catarina Lopes',
+          authorMec: '6304',
+          authorEmail: 'catarina.lopes@exemplo.pt',
+          authorRole: 'ENFERMEIRO',
+          targetDate: offsetDateISO(1),
+          targetShift: 'T',
+          offeredShifts: [
+            { date: offsetDateISO(3), shift: 'M' }
+          ],
+          eligibility: 'ALL',
+          notes: 'Troca concluída com a equipa.',
+          status: 'MATCHED',
+          proposals: [],
+          matchedWith: {
+            userId: 'u-ana',
+            name: 'Ana Rita Silva',
+            mec: '4821',
+            email: 'ana.silva@exemplo.pt',
+            role: 'CHEFE_EQUIPA',
+            exchangedShift: `${formatDatePT(offsetDateISO(3))} · M (08h00 – 15h30)`
+          }
+        }
+      ];
+
+      let users = loadJSON(KEYS.USERS, seedUsers);
+      let currentUser = loadJSON(KEYS.SESSION, null);
+      let swapRequests = loadJSON(KEYS.REQUESTS, seedRequests);
+      let notifications = loadJSON(KEYS.NOTIFS, []);
+      let syncConfig = Object.assign(
+        { mode: 'LOCAL', url: '', room: 'SUG_HFF_GERAL', intervalMs: 15000 },
+        loadJSON(KEYS.SYNC, {})
+      );
+
+      let draftOffers = [];
+      let pollTimer = null;
+
+      const activeFilters = {
+        search: '',
+        shift: 'ALL',
+        status: 'ALL',
+        elig: 'ALL'
+      };
+
+      const channel = ('BroadcastChannel' in window) ? new BroadcastChannel('sug_hff_turnos_v2') : null;
+
+      // Referências DOM
+      const openAuthBtn = document.getElementById('openAuthBtn');
+      const authLoggedOutBox = document.getElementById('authLoggedOutBox');
+      const authLoggedInBox = document.getElementById('authLoggedInBox');
+      const userSummaryBadge = document.getElementById('userSummaryBadge');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const openPrefsBtn = document.getElementById('openPrefsBtn');
+      const openNotifBtn = document.getElementById('openNotifBtn');
+      const unreadCountBadge = document.getElementById('unreadCountBadge');
+      const bannerSessionNotice = document.getElementById('bannerSessionNotice');
+
+      const authModal = document.getElementById('authModal');
+      const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
+      const tabLoginBtn = document.getElementById('tabLoginBtn');
+      const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+
+      const createRequestForm = document.getElementById('createRequestForm');
+      const targetDateInput = document.getElementById('targetDateInput');
+      const targetShiftInput = document.getElementById('targetShiftInput');
+      const targetShiftScheduleHint = document.getElementById('targetShiftScheduleHint');
+      const altOfferDateInput = document.getElementById('altOfferDateInput');
+      const altOfferShiftInput = document.getElementById('altOfferShiftInput');
+      const addAltOfferBtn = document.getElementById('addAltOfferBtn');
+      const draftOffersList = document.getElementById('draftOffersList');
+      const eligibilitySelect = document.getElementById('eligibilitySelect');
+      const requestNotesInput = document.getElementById('requestNotesInput');
+
+      const requestsBoardList = document.getElementById('requestsBoardList');
+      const myCompletedTableContainer = document.getElementById('myCompletedTableContainer');
+      const searchFilterInput = document.getElementById('searchFilterInput');
+      const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+
+      const proposeModal = document.getElementById('proposeModal');
+      const closeProposeModalBtn = document.getElementById('closeProposeModalBtn');
+      const cancelProposeBtn = document.getElementById('cancelProposeBtn');
+      const proposeForm = document.getElementById('proposeForm');
+      const proposeRequestId = document.getElementById('proposeRequestId');
+      const proposeModalSubtitle = document.getElementById('proposeModalSubtitle');
+      const proposeOfferSelect = document.getElementById('proposeOfferSelect');
+      const customProposeBox = document.getElementById('customProposeBox');
+      const customOfferDateInput = document.getElementById('customOfferDateInput');
+      const customOfferShiftInput = document.getElementById('customOfferShiftInput');
+      const proposeNoteInput = document.getElementById('proposeNoteInput');
+
+      const prefsModal = document.getElementById('prefsModal');
+      const closePrefsModalBtn = document.getElementById('closePrefsModalBtn');
+      const cancelPrefsBtn = document.getElementById('cancelPrefsBtn');
+      const prefsForm = document.getElementById('prefsForm');
+
+      const notifModal = document.getElementById('notifModal');
+      const closeNotifModalBtn = document.getElementById('closeNotifModalBtn');
+      const notifPrefSubtitle = document.getElementById('notifPrefSubtitle');
+      const markAllReadBtn = document.getElementById('markAllReadBtn');
+      const notifListContainer = document.getElementById('notifListContainer');
+
+      const openSyncBtn = document.getElementById('openSyncBtn');
+      const syncDot = document.getElementById('syncDot');
+      const syncStatusText = document.getElementById('syncStatusText');
+      const syncModal = document.getElementById('syncModal');
+      const closeSyncModalBtn = document.getElementById('closeSyncModalBtn');
+      const cancelSyncBtn = document.getElementById('cancelSyncBtn');
+      const syncForm = document.getElementById('syncForm');
+      const syncModeSelect = document.getElementById('syncModeSelect');
+      const remoteSyncConfigBox = document.getElementById('remoteSyncConfigBox');
+      const syncUrlInput = document.getElementById('syncUrlInput');
+      const syncRoomInput = document.getElementById('syncRoomInput');
+      const syncIntervalInput = document.getElementById('syncIntervalInput');
+      const syncGuideContainer = document.getElementById('syncGuideContainer');
+      const syncStatusDetail = document.getElementById('syncStatusDetail');
+      const testSyncNowBtn = document.getElementById('testSyncNowBtn');
+
+      function showToast(msg, type) {
+        const prev = document.querySelector('.toast');
+        if (prev) prev.remove();
+        const el = document.createElement('div');
+        el.className = 'toast ' + (type === 'error' ? 'toast-error' : type === 'info' ? 'toast-info' : 'toast-success');
+        el.setAttribute('role', 'status');
+        el.textContent = msg;
+        document.body.appendChild(el);
+        setTimeout(() => {
+          if (el.parentNode) el.remove();
+        }, 4200);
+      }
+
+      function formatNurseIdentity(name, mec) {
+        const cleanName = String(name || 'Enfermeiro(a)').trim();
+        const cleanMec = String(mec || '').trim();
+        return cleanMec ? `${cleanName} (Mec. ${cleanMec})` : cleanName;
+      }
+
+      function canUserRespondToRequest(user, req) {
+        if (!user) return false;
+        if (req.eligibility === 'ALL') return true;
+        if (req.eligibility === 'CHEFE_EQUIPA') return user.role === 'CHEFE_EQUIPA';
+        if (req.eligibility === 'ENF_RESPONSAVEL') return user.role === 'ENF_RESPONSAVEL';
+        return true;
+      }
+
+      // Notificações respeitando definições pessoais do utilizador alvo
+      function emitNotification(targetUserId, title, detail) {
+        const targetUser = users.find((u) => u.id === targetUserId);
+        const pref = targetUser ? targetUser.notifPref : 'BOTH';
+        if (pref === 'NONE') return;
+
+        const channels = [];
+        if (pref === 'PLATFORM' || pref === 'BOTH') channels.push('Plataforma');
+        if (pref === 'EMAIL' || pref === 'BOTH') channels.push(`E-mail (${targetUser ? targetUser.email : ''})`);
+
+        notifications.unshift({
+          id: 'notif-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+          userId: targetUserId,
+          title,
+          detail,
+          channelsText: channels.join(' + '),
+          read: false,
+          createdAt: new Date().toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })
+        });
+        saveJSON(KEYS.NOTIFS, notifications);
+      }
+
+      function persistAll(notifyRemote) {
+        saveJSON(KEYS.USERS, users);
+        saveJSON(KEYS.REQUESTS, swapRequests);
+        saveJSON(KEYS.NOTIFS, notifications);
+        if (currentUser) {
+          const fresh = users.find((u) => u.id === currentUser.id);
+          if (fresh) {
+            currentUser = fresh;
+            saveJSON(KEYS.SESSION, currentUser);
+          }
+        }
+        if (channel) {
+          try {
+            channel.postMessage({ type: 'UPDATED', at: Date.now() });
+          } catch (e) {}
+        }
+        if (notifyRemote && syncConfig.mode !== 'LOCAL' && syncConfig.url.trim()) {
+          pushRemoteState(true);
+        }
+      }
+
+      // =====================================================================
+      // AUTENTICAÇÃO E DEFINIÇÕES PESSOAIS
+      // =====================================================================
+      function openAuthModal() {
+        authModal.classList.add('open');
+      }
+
+      function closeAuthModal() {
+        authModal.classList.remove('open');
+      }
+
+      openAuthBtn.addEventListener('click', openAuthModal);
+      closeAuthModalBtn.addEventListener('click', closeAuthModal);
+      authModal.addEventListener('click', (e) => {
+        if (e.target === authModal) closeAuthModal();
+      });
+
+      tabLoginBtn.addEventListener('click', () => {
+        tabLoginBtn.className = 'btn btn-primary btn-sm';
+        tabRegisterBtn.className = 'btn btn-outline btn-sm';
+        tabLoginBtn.style.flex = '1';
+        tabRegisterBtn.style.flex = '1';
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+      });
+
+      tabRegisterBtn.addEventListener('click', () => {
+        tabRegisterBtn.className = 'btn btn-primary btn-sm';
+        tabLoginBtn.className = 'btn btn-outline btn-sm';
+        tabLoginBtn.style.flex = '1';
+        tabRegisterBtn.style.flex = '1';
+        registerForm.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+      });
+
+      document.querySelectorAll('.demo-login-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const email = btn.getAttribute('data-demo-email');
+          const found = users.find((u) => u.email.toLowerCase() === String(email).toLowerCase());
+          if (found) {
+            currentUser = found;
+            saveJSON(KEYS.SESSION, currentUser);
+            closeAuthModal();
+            renderAll();
+            showToast(`Sessão iniciada: ${formatNurseIdentity(found.name, found.mec)}.`, 'success');
+          }
+        });
+      });
+
+      loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const emailVal = document.getElementById('loginEmailInput').value.trim().toLowerCase();
+        const passVal = document.getElementById('loginPasswordInput').value;
+
+        if (!emailVal || !passVal) {
+          showToast('Preenche o e-mail e a palavra-passe.', 'error');
+          return;
+        }
+
+        let user = users.find((u) => u.email.toLowerCase() === emailVal);
+        if (!user) {
+          // Permite entrar diretamente com qualquer e-mail à escolha criando perfil rápido
+          const derivedName = emailVal.split('@')[0].replace(/[._-]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+          const randomMec = String(Math.floor(7000 + Math.random() * 2900));
+          user = {
+            id: 'u-' + Date.now(),
+            name: derivedName || 'Enfermeiro(a)',
+            mec: randomMec,
+            email: emailVal,
+            password: passVal,
+            role: 'ENFERMEIRO',
+            notifPref: 'BOTH'
+          };
+          users.push(user);
+          saveJSON(KEYS.USERS, users);
+        }
+
+        currentUser = user;
+        saveJSON(KEYS.SESSION, currentUser);
+        loginForm.reset();
+        closeAuthModal();
+        renderAll();
+        showToast(`Bem-vindo(a), ${formatNurseIdentity(user.name, user.mec)}.`, 'success');
+      });
+
+      registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('regNameInput').value.trim();
+        const mec = document.getElementById('regMecInput').value.trim();
+        const email = document.getElementById('regEmailInput').value.trim().toLowerCase();
+        const role = document.getElementById('regRoleSelect').value;
+        const notifPref = document.getElementById('regNotifPrefSelect').value;
+        const password = document.getElementById('regPasswordInput').value;
+
+        if (!name || !mec || !email || password.length < 4) {
+          showToast('Preenche todos os campos obrigatórios (palavra-passe com pelo menos 4 caracteres).', 'error');
+          return;
+        }
+
+        const existingIndex = users.findIndex((u) => u.email.toLowerCase() === email);
+        const profile = {
+          id: existingIndex >= 0 ? users[existingIndex].id : 'u-' + Date.now(),
+          name,
+          mec,
+          email,
+          password,
+          role,
+          notifPref
+        };
+
+        if (existingIndex >= 0) {
+          users[existingIndex] = profile;
+        } else {
+          users.push(profile);
+        }
+
+        currentUser = profile;
+        saveJSON(KEYS.USERS, users);
+        saveJSON(KEYS.SESSION, currentUser);
+        registerForm.reset();
+        closeAuthModal();
+        renderAll();
+        showToast(`Conta criada: ${formatNurseIdentity(profile.name, profile.mec)}.`, 'success');
+      });
+
+      logoutBtn.addEventListener('click', () => {
+        currentUser = null;
+        localStorage.removeItem(KEYS.SESSION);
+        renderAll();
+        showToast('Sessão terminada.', 'info');
+      });
+
+      // Definições pessoais
+      openPrefsBtn.addEventListener('click', () => {
+        if (!currentUser) return;
+        document.getElementById('prefNameInput').value = currentUser.name || '';
+        document.getElementById('prefMecInput').value = currentUser.mec || '';
+        document.getElementById('prefRoleSelect').value = currentUser.role || 'ENFERMEIRO';
+        document.getElementById('prefNotifSelect').value = currentUser.notifPref || 'BOTH';
+        prefsModal.classList.add('open');
+      });
+
+      function closePrefsModal() {
+        prefsModal.classList.remove('open');
+      }
+
+      closePrefsModalBtn.addEventListener('click', closePrefsModal);
+      cancelPrefsBtn.addEventListener('click', closePrefsModal);
+      prefsModal.addEventListener('click', (e) => {
+        if (e.target === prefsModal) closePrefsModal();
+      });
+
+      prefsForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!currentUser) return;
+
+        const name = document.getElementById('prefNameInput').value.trim();
+        const mec = document.getElementById('prefMecInput').value.trim();
+        const role = document.getElementById('prefRoleSelect').value;
+        const notifPref = document.getElementById('prefNotifSelect').value;
+
+        if (!name || !mec) {
+          showToast('Indica o nome e o n.º mecanográfico.', 'error');
+          return;
+        }
+
+        const idx = users.findIndex((u) => u.id === currentUser.id);
+        if (idx >= 0) {
+          users[idx] = Object.assign({}, users[idx], { name, mec, role, notifPref });
+          currentUser = users[idx];
+        } else {
+          currentUser = Object.assign({}, currentUser, { name, mec, role, notifPref });
+          users.push(currentUser);
+        }
+        saveJSON(KEYS.SESSION, currentUser);
+        persistAll(false);
+        closePrefsModal();
+        renderAll();
+        showToast('Definições pessoais guardadas.', 'success');
+      });
+
+      // Notificações
+      openNotifBtn.addEventListener('click', () => {
+        if (!currentUser) {
+          showToast('Inicia sessão para ver as tuas notificações.', 'info');
+          openAuthModal();
+          return;
+        }
+        renderNotificationsModal();
+        notifModal.classList.add('open');
+      });
+
+      function closeNotifModal() {
+        notifModal.classList.remove('open');
+      }
+
+      closeNotifModalBtn.addEventListener('click', closeNotifModal);
+      notifModal.addEventListener('click', (e) => {
+        if (e.target === notifModal) closeNotifModal();
+      });
+
+      markAllReadBtn.addEventListener('click', () => {
+        if (!currentUser) return;
+        notifications = notifications.map((n) => (n.userId === currentUser.id ? Object.assign({}, n, { read: true }) : n));
+        persistAll(false);
+        renderNotificationsModal();
+        updateUnreadBadge();
+      });
+
+      function renderNotificationsModal() {
+        if (!currentUser) return;
+        const prefLabel = NOTIF_PREF_LABEL[currentUser.notifPref] || 'Ambos';
+        notifPrefSubtitle.textContent = `A tua definição atual: ${prefLabel}.`;
+
+        const mine = notifications.filter((n) => n.userId === currentUser.id);
+        if (mine.length === 0) {
+          notifListContainer.innerHTML = `<p style="font-size:0.84rem; color:#5c434a;">Ainda não tens notificações registadas.</p>`;
+          return;
+        }
+
+        notifListContainer.innerHTML = mine
+          .map(
+            (n) => `
+          <div class="notif-item ${n.read ? '' : 'unread'}">
+            <div style="display:flex; justify-content:space-between; gap:8px; font-weight:800; color:#1f1418;">
+              <span>${escapeHTML(n.title)}</span>
+              <span style="font-size:0.72rem; color:#5c434a;">${escapeHTML(n.createdAt)}</span>
+            </div>
+            <div style="margin-top:4px; color:#3b262d;">${escapeHTML(n.detail)}</div>
+            <div style="margin-top:4px; font-size:0.72rem; color:#6b1d2f; font-weight:700;">
+              Canal: ${escapeHTML(n.channelsText)}
+            </div>
+          </div>
+        `
+          )
+          .join('');
+      }
+
+      function updateUnreadBadge() {
+        if (!currentUser) {
+          unreadCountBadge.classList.add('hidden');
+          return;
+        }
+        const count = notifications.filter((n) => n.userId === currentUser.id && !n.read).length;
+        if (count > 0) {
+          unreadCountBadge.textContent = String(count);
+          unreadCountBadge.classList.remove('hidden');
+        } else {
+          unreadCountBadge.classList.add('hidden');
+        }
+      }
+
+      // =====================================================================
+      // CRIAÇÃO DE PEDIDOS DE TROCA
+      // =====================================================================
+      function initDates() {
+        targetDateInput.value = offsetDateISO(2);
+        altOfferDateInput.value = offsetDateISO(4);
+        customOfferDateInput.value = offsetDateISO(5);
+      }
+
+      document.querySelectorAll('.shift-choice-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const shift = btn.getAttribute('data-target-shift');
+          targetShiftInput.value = shift;
+          document.querySelectorAll('.shift-choice-btn').forEach((b) => {
+            b.className = 'shift-choice-btn';
+            if (b.getAttribute('data-target-shift') === shift) {
+              b.classList.add('active-' + shift);
+            }
+          });
+          const info = SHIFT_INFO[shift] || SHIFT_INFO.M;
+          targetShiftScheduleHint.textContent = `Horário selecionado: ${info.schedule} (${info.name})`;
+        });
+      });
+
+      addAltOfferBtn.addEventListener('click', () => {
+        const d = altOfferDateInput.value;
+        const s = altOfferShiftInput.value;
+        if (!d) {
+          showToast('Escolhe um dia para o turno alternativo.', 'error');
+          return;
+        }
+        if (d === targetDateInput.value && s === targetShiftInput.value) {
+          showToast('O turno alternativo deve ser diferente do turno que pretendes ceder.', 'error');
+          return;
+        }
+        if (draftOffers.some((item) => item.date === d && item.shift === s)) {
+          showToast('Esse dia e turno já consta na lista.', 'info');
+          return;
+        }
+        draftOffers.push({ date: d, shift: s });
+        renderDraftOffers();
+      });
+
+      window.removeDraftOfferAt = function (idx) {
+        draftOffers.splice(idx, 1);
+        renderDraftOffers();
+      };
+
+      function renderDraftOffers() {
+        if (draftOffers.length === 0) {
+          draftOffersList.innerHTML = `<p style="font-size:0.76rem; color:#5c434a; margin:6px 0 0;">Nenhum turno alternativo adicionado ainda.</p>`;
+          return;
+        }
+        draftOffersList.innerHTML = draftOffers
+          .map((o, idx) => {
+            const info = SHIFT_INFO[o.shift] || SHIFT_INFO.M;
+            return `
+              <div class="offer-chip">
+                <span>
+                  <strong>${escapeHTML(formatDatePT(o.date))}</strong> ·
+                  <span class="badge ${info.pillClass}">${escapeHTML(info.code)} (${escapeHTML(info.schedule)})</span>
+                </span>
+                <button type="button" class="btn btn-outline btn-sm" onclick="removeDraftOfferAt(${idx})">Remover</button>
+              </div>
+            `;
+          })
+          .join('');
+      }
+
+      createRequestForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!currentUser) {
+          showToast('Inicia sessão para publicar um pedido de troca.', 'info');
+          openAuthModal();
+          return;
+        }
+
+        const tDate = targetDateInput.value;
+        const tShift = targetShiftInput.value;
+        const eligibility = eligibilitySelect.value;
+        const notes = requestNotesInput.value.trim();
+
+        if (!tDate) {
+          showToast('Escolhe o dia do turno a ceder.', 'error');
+          return;
+        }
+
+        if (draftOffers.length === 0 && altOfferDateInput.value) {
+          draftOffers.push({ date: altOfferDateInput.value, shift: altOfferShiftInput.value });
+        }
+
+        if (draftOffers.length === 0) {
+          showToast('Adiciona pelo menos 1 turno de outro dia que aceitas fazer em troca.', 'error');
+          return;
+        }
+
+        const newReq = {
+          id: 'req-' + Date.now(),
+          authorId: currentUser.id,
+          authorName: currentUser.name,
+          authorMec: currentUser.mec,
+          authorEmail: currentUser.email,
+          authorRole: currentUser.role,
+          targetDate: tDate,
+          targetShift: tShift,
+          offeredShifts: draftOffers.slice(),
+          eligibility,
+          notes,
+          status: 'OPEN',
+          proposals: [],
+          matchedWith: null
+        };
+
+        swapRequests.unshift(newReq);
+        draftOffers = [];
+        requestNotesInput.value = '';
+        renderDraftOffers();
+        persistAll(true);
+        renderAll();
+        showToast('Pedido de troca publicado no quadro.', 'success');
+      });
+
+      // =====================================================================
+      // PROPÔR TROCA E CONFIRMAR MATCH
+      // =====================================================================
+      window.openProposeModalForRequest = function (reqId) {
+        if (!currentUser) {
+          showToast('Inicia sessão para propôr uma troca.', 'info');
+          openAuthModal();
+          return;
+        }
+        const req = swapRequests.find((r) => r.id === reqId);
+        if (!req) return;
+
+        if (!canUserRespondToRequest(currentUser, req)) {
+          showToast(`Este pedido é exclusivo para o posto ${ELIGIBILITY_LABEL[req.eligibility]}.`, 'error');
+          return;
+        }
+
+        const tInfo = SHIFT_INFO[req.targetShift] || SHIFT_INFO.M;
+        proposeRequestId.value = req.id;
+        proposeNoteInput.value = '';
+        proposeModalSubtitle.textContent = `Cobrir turno de ${formatNurseIdentity(req.authorName, req.authorMec)} em ${formatDatePT(req.targetDate)} · ${tInfo.code} (${tInfo.schedule})`;
+
+        const opts = req.offeredShifts.map((o) => {
+          const info = SHIFT_INFO[o.shift] || SHIFT_INFO.M;
+          const label = `${formatDatePT(o.date)} · ${info.code} (${info.schedule})`;
+          return `<option value="${escapeHTML(label)}">${escapeHTML(label)}</option>`;
+        });
+        opts.push(`<option value="CUSTOM">Outro dia / turno alternativo...</option>`);
+        proposeOfferSelect.innerHTML = opts.join('');
+        toggleCustomProposeBox();
+
+        proposeModal.classList.add('open');
+      };
+
+      function toggleCustomProposeBox() {
+        if (proposeOfferSelect.value === 'CUSTOM') {
+          customProposeBox.classList.remove('hidden');
+        } else {
+          customProposeBox.classList.add('hidden');
+        }
+      }
+
+      proposeOfferSelect.addEventListener('change', toggleCustomProposeBox);
+
+      function closeProposeModal() {
+        proposeModal.classList.remove('open');
+      }
+
+      closeProposeModalBtn.addEventListener('click', closeProposeModal);
+      cancelProposeBtn.addEventListener('click', closeProposeModal);
+      proposeModal.addEventListener('click', (e) => {
+        if (e.target === proposeModal) closeProposeModal();
+      });
+
+      proposeForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!currentUser) return;
+
+        const req = swapRequests.find((r) => r.id === proposeRequestId.value);
+        if (!req) return;
+
+        let chosenOffer = proposeOfferSelect.value;
+        if (chosenOffer === 'CUSTOM') {
+          const cDate = customOfferDateInput.value;
+          const cShift = customOfferShiftInput.value;
+          if (!cDate) {
+            showToast('Escolhe o dia do turno alternativo.', 'error');
+            return;
+          }
+          const cInfo = SHIFT_INFO[cShift] || SHIFT_INFO.M;
+          chosenOffer = `${formatDatePT(cDate)} · ${cInfo.code} (${cInfo.schedule})`;
+        }
+
+        const proposal = {
+          id: 'prop-' + Date.now(),
+          userId: currentUser.id,
+          name: currentUser.name,
+          mec: currentUser.mec,
+          email: currentUser.email,
+          role: currentUser.role,
+          exchangedShift: chosenOffer,
+          note: proposeNoteInput.value.trim()
+        };
+
+        req.proposals.push(proposal);
+        if (req.status === 'OPEN') {
+          req.status = 'PENDING';
+        }
+
+        emitNotification(
+          req.authorId,
+          'Nova proposta de troca recebida',
+          `${formatNurseIdentity(currentUser.name, currentUser.mec)} propôs troca para ${formatDatePT(req.targetDate)} (${req.targetShift}) com ${chosenOffer}.`
+        );
+
+        persistAll(true);
+        closeProposeModal();
+        renderAll();
+        showToast('Proposta de troca enviada com sucesso.', 'success');
+      });
+
+      window.confirmSwapMatch = function (reqId, proposalId) {
+        const req = swapRequests.find((r) => r.id === reqId);
+        if (!req) return;
+        const prop = req.proposals.find((p) => p.id === proposalId);
+        if (!prop) return;
+
+        req.status = 'MATCHED';
+        req.matchedWith = {
+          userId: prop.userId,
+          name: prop.name,
+          mec: prop.mec,
+          email: prop.email,
+          role: prop.role,
+          exchangedShift: prop.exchangedShift
+        };
+
+        const tInfo = SHIFT_INFO[req.targetShift] || SHIFT_INFO.M;
+        const matchSummary = `${formatDatePT(req.targetDate)} · ${tInfo.code} (${tInfo.schedule}) ↔ ${prop.exchangedShift}`;
+
+        emitNotification(
+          req.authorId,
+          'Match de troca confirmado!',
+          `Troca confirmada com ${formatNurseIdentity(prop.name, prop.mec)}: ${matchSummary}.`
+        );
+        emitNotification(
+          prop.userId,
+          'Match de troca confirmado!',
+          `A tua proposta de troca com ${formatNurseIdentity(req.authorName, req.authorMec)} foi confirmada: ${matchSummary}.`
+        );
+
+        persistAll(true);
+        renderAll();
+        showToast('Troca confirmada e match registado!', 'success');
+      };
+
+      window.deleteSwapRequest = function (reqId) {
+        swapRequests = swapRequests.filter((r) => r.id !== reqId);
+        persistAll(true);
+        renderAll();
+        showToast('Pedido removido do quadro.', 'info');
+      };
+
+      // =====================================================================
+      // FILTROS, QUADRO E TABELA INDIVIDUAL DE TROCAS CONCLUÍDAS
+      // =====================================================================
+      document.querySelectorAll('.filter-pill').forEach((pill) => {
+        pill.addEventListener('click', () => {
+          const fShift = pill.getAttribute('data-filter-shift');
+          const fStatus = pill.getAttribute('data-filter-status');
+          const fElig = pill.getAttribute('data-filter-elig');
+
+          if (fShift) {
+            activeFilters.shift = fShift;
+            document.querySelectorAll('[data-filter-shift]').forEach((b) => b.classList.toggle('active', b === pill));
+          }
+          if (fStatus) {
+            activeFilters.status = fStatus;
+            document.querySelectorAll('[data-filter-status]').forEach((b) => b.classList.toggle('active', b === pill));
+          }
+          if (fElig) {
+            activeFilters.elig = activeFilters.elig === fElig ? 'ALL' : fElig;
+            document.querySelectorAll('[data-filter-elig]').forEach((b) => {
+              b.classList.toggle('active', activeFilters.elig === b.getAttribute('data-filter-elig'));
+            });
+          }
+          renderBoard();
+        });
+      });
+
+      searchFilterInput.addEventListener('input', (e) => {
+        activeFilters.search = e.target.value.trim().toLowerCase();
+        renderBoard();
+      });
+
+      resetFiltersBtn.addEventListener('click', () => {
+        activeFilters.search = '';
+        activeFilters.shift = 'ALL';
+        activeFilters.status = 'ALL';
+        activeFilters.elig = 'ALL';
+        searchFilterInput.value = '';
+
+        document.querySelectorAll('.filter-pill').forEach((b) => {
+          b.classList.remove('active');
+          if (b.getAttribute('data-filter-shift') === 'ALL') b.classList.add('active');
+          if (b.getAttribute('data-filter-status') === 'ALL') b.classList.add('active');
+        });
+        renderBoard();
+      });
+
+      function renderBoard() {
+        const list = swapRequests.filter((req) => {
+          if (activeFilters.shift !== 'ALL') {
+            const matchTarget = req.targetShift === activeFilters.shift;
+            const matchOffer = req.offeredShifts.some((o) => o.shift === activeFilters.shift);
+            if (!matchTarget && !matchOffer) return false;
+          }
+          if (activeFilters.status !== 'ALL' && req.status !== activeFilters.status) {
+            return false;
+          }
+          if (activeFilters.elig !== 'ALL' && req.eligibility !== activeFilters.elig) {
+            return false;
+          }
+          if (activeFilters.search) {
+            const offersStr = req.offeredShifts.map((o) => `${formatDatePT(o.date)} ${o.shift}`).join(' ');
+            const blob = `${req.authorName} ${req.authorMec} ${formatDatePT(req.targetDate)} ${req.targetShift} ${offersStr} ${req.notes || ''}`.toLowerCase();
+            if (!blob.includes(activeFilters.search)) return false;
+          }
+          return true;
+        });
+
+        if (list.length === 0) {
+          requestsBoardList.innerHTML = `<div class="swap-card"><p style="margin:0; font-size:0.84rem; color:#5c434a;">Não há pedidos de troca com os filtros selecionados.</p></div>`;
+          return;
+        }
+
+        requestsBoardList.innerHTML = list
+          .map((req) => {
+            const tInfo = SHIFT_INFO[req.targetShift] || SHIFT_INFO.M;
+            const rInfo = ROLE_INFO[req.authorRole] || ROLE_INFO.ENFERMEIRO;
+            const statusLabel = req.status === 'MATCHED' ? 'Concluído' : req.status === 'PENDING' ? 'Pendente' : 'Aberto';
+            const statusClass = req.status === 'MATCHED' ? 'status-matched' : req.status === 'PENDING' ? 'status-pending' : 'status-open';
+            const eligibleNow = canUserRespondToRequest(currentUser, req);
+
+            const offersHTML = req.offeredShifts
+              .map((o) => {
+                const info = SHIFT_INFO[o.shift] || SHIFT_INFO.M;
+                return `<span class="offered-tag">${escapeHTML(formatDatePT(o.date))} · <span class="badge ${info.pillClass}">${escapeHTML(info.code)} (${escapeHTML(info.schedule)})</span></span>`;
+              })
+              .join('');
+
+            const proposalsHTML =
+              req.proposals && req.proposals.length > 0
+                ? `<div class="proposals-box">
+                    <strong style="font-size:0.74rem; text-transform:uppercase; color:#4d1321;">Propostas recebidas (${req.proposals.length})</strong>
+                    ${req.proposals
+                      .map((p) => {
+                        const pRole = ROLE_INFO[p.role] || ROLE_INFO.ENFERMEIRO;
+                        const canConfirm = currentUser && (currentUser.id === req.authorId || currentUser.id === p.userId) && req.status !== 'MATCHED';
+                        return `
+                          <div class="proposal-item">
+                            <div>
+                              <strong>${escapeHTML(formatNurseIdentity(p.name, p.mec))}</strong>
+                              <span class="badge ${pRole.badgeClass}">${escapeHTML(pRole.label)}</span>
+                              <div style="margin-top:3px;">Turno proposto: <strong>${escapeHTML(p.exchangedShift)}</strong></div>
+                              ${p.note ? `<div style="color:#5c434a; font-style:italic;">"${escapeHTML(p.note)}"</div>` : ''}
+                            </div>
+                            ${
+                              canConfirm
+                                ? `<button type="button" class="btn btn-primary btn-sm" onclick="confirmSwapMatch('${escapeHTML(req.id)}', '${escapeHTML(p.id)}')">Confirmar match</button>`
+                                : ''
+                            }
+                          </div>
+                        `;
+                      })
+                      .join('')}
+                  </div>`
+                : '';
+
+            return `
+              <article class="swap-card">
+                <div class="swap-top">
+                  <div class="swap-author-line">
+                    <span class="swap-author-name">${escapeHTML(formatNurseIdentity(req.authorName, req.authorMec))}</span>
+                    <span class="badge ${rInfo.badgeClass}">${escapeHTML(rInfo.label)}</span>
+                    <span class="badge badge-role-enf">${escapeHTML(ELIGIBILITY_LABEL[req.eligibility] || ELIGIBILITY_LABEL.ALL)}</span>
+                  </div>
+                  <span class="badge ${statusClass}">${escapeHTML(statusLabel)}</span>
+                </div>
+
+                <div class="swap-exchange-box">
+                  <div>
+                    <div style="font-size:0.72rem; font-weight:800; text-transform:uppercase; color:#5c434a;">Turno a ceder</div>
+                    <div style="margin-top:5px; font-weight:800; color:#1f1418;">
+                      ${escapeHTML(formatDatePT(req.targetDate))} ·
+                      <span class="badge ${tInfo.pillClass}">${escapeHTML(tInfo.code)} (${escapeHTML(tInfo.schedule)})</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div style="font-size:0.72rem; font-weight:800; text-transform:uppercase; color:#5c434a;">Turnos aceites em troca</div>
+                    <div class="offered-list">${offersHTML}</div>
+                  </div>
+                </div>
+
+                ${req.notes ? `<p style="margin:10px 0 0; font-size:0.8rem; color:#5c434a;">${escapeHTML(req.notes)}</p>` : ''}
+
+                ${
+                  req.status === 'MATCHED' && req.matchedWith
+                    ? `<p style="margin:10px 0 0; font-size:0.8rem; font-weight:700; color:#166534;">
+                        Troca concluída entre ${escapeHTML(formatNurseIdentity(req.authorName, req.authorMec))} e ${escapeHTML(formatNurseIdentity(req.matchedWith.name, req.matchedWith.mec))}.
+                      </p>`
+                    : ''
+                }
+
+                ${proposalsHTML}
+
+                <div class="swap-actions">
+                  <div class="swap-actions-left">
+                    ${
+                      req.status !== 'MATCHED'
+                        ? `<button
+                            type="button"
+                            class="btn btn-primary btn-sm"
+                            onclick="openProposeModalForRequest('${escapeHTML(req.id)}')"
+                            ${currentUser && !eligibleNow ? 'disabled style="opacity:0.55; cursor:not-allowed;"' : ''}
+                          >
+                            Propôr troca
+                          </button>`
+                        : ''
+                    }
+                    ${
+                      currentUser && !eligibleNow && req.status !== 'MATCHED'
+                        ? `<span style="font-size:0.74rem; color:#991b1b; font-weight:700; align-self:center;">
+                            Exclusivo ${escapeHTML(ELIGIBILITY_LABEL[req.eligibility])}
+                          </span>`
+                        : ''
+                    }
+                  </div>
+
+                  ${
+                    currentUser && currentUser.id === req.authorId
+                      ? `<button type="button" class="btn btn-danger-outline btn-sm" onclick="deleteSwapRequest('${escapeHTML(req.id)}')">Eliminar</button>`
+                      : ''
+                  }
+                </div>
+              </article>
+            `;
+          })
+          .join('');
+      }
+
+      // Tabela individual exclusiva: mostra APENAS as trocas concluídas em que o utilizador atual participa
+      function renderMyCompletedTable() {
+        if (!currentUser) {
+          myCompletedTableContainer.innerHTML = `<p style="padding:14px; margin:0; font-size:0.82rem; color:#5c434a;">Inicia sessão para ver exclusivamente as tuas trocas concluídas.</p>`;
+          document.getElementById('statMineMatched').textContent = '0';
+          return;
+        }
+
+        const mineMatched = swapRequests.filter((req) => {
+          if (req.status !== 'MATCHED' || !req.matchedWith) return false;
+          const isAuthor = req.authorId === currentUser.id;
+          const isPartner = req.matchedWith.userId === currentUser.id;
+          return isAuthor || isPartner;
+        });
+
+        document.getElementById('statMineMatched').textContent = String(mineMatched.length);
+
+        if (mineMatched.length === 0) {
+          myCompletedTableContainer.innerHTML = `<p style="padding:14px; margin:0; font-size:0.82rem; color:#5c434a;">Ainda não tens trocas concluídas registadas na tua conta.</p>`;
+          return;
+        }
+
+        myCompletedTableContainer.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Turno Cedido</th>
+                <th>Turno em Troca</th>
+                <th>Colega da Troca</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${mineMatched
+                .map((req) => {
+                  const tInfo = SHIFT_INFO[req.targetShift] || SHIFT_INFO.M;
+                  const iAmAuthor = req.authorId === currentUser.id;
+                  const partnerName = iAmAuthor
+                    ? formatNurseIdentity(req.matchedWith.name, req.matchedWith.mec)
+                    : formatNurseIdentity(req.authorName, req.authorMec);
+                  const partnerRoleKey = iAmAuthor ? req.matchedWith.role : req.authorRole;
+                  const partnerRole = ROLE_INFO[partnerRoleKey] || ROLE_INFO.ENFERMEIRO;
+
+                  return `
+                    <tr>
+                      <td><strong>${escapeHTML(formatDatePT(req.targetDate))}</strong> · ${escapeHTML(tInfo.code)} (${escapeHTML(tInfo.schedule)})</td>
+                      <td>${escapeHTML(req.matchedWith.exchangedShift || 'Conforme acordo')}</td>
+                      <td>
+                        <div><strong>${escapeHTML(partnerName)}</strong></div>
+                        <span class="badge ${partnerRole.badgeClass}" style="margin-top:3px;">${escapeHTML(partnerRole.label)}</span>
+                      </td>
+                    </tr>
+                  `;
+                })
+                .join('')}
+            </tbody>
+          </table>
+        `;
+      }
+
+      // =====================================================================
+      // SINCRONIZAÇÃO EM TEMPO REAL (LOCAL / APPS SCRIPT / FIREBASE / FIRESTORE)
+      // =====================================================================
+      function updateSyncIndicator(state, label) {
+        if (state === 'error') {
+          syncDot.style.backgroundColor = '#dc2626';
+        } else if (syncConfig.mode !== 'LOCAL') {
+          syncDot.style.backgroundColor = '#16a34a';
+        } else {
+          syncDot.style.backgroundColor = '#6b1d2f';
+        }
+        syncStatusText.textContent = label || (syncConfig.mode === 'LOCAL' ? 'Sincronização: Local' : `Sincronização: ${syncConfig.mode}`);
+      }
+
+      function renderSyncGuide() {
+        const m = syncModeSelect.value;
+        if (m === 'APPS_SCRIPT') {
+          syncGuideContainer.innerHTML = `
+            <div style="font-size:0.74rem; color:#5c434a;">
+              <strong>Google Apps Script (doGet / doPost):</strong>
+              <div class="code-box">function doGet(e) {
+  const room = (e.parameter.room || 'SUG_HFF_GERAL');
+  const raw = PropertiesService.getScriptProperties().getProperty('TURNOS_' + room) || '{}';
+  return ContentService.createTextOutput(raw).setMimeType(ContentService.MimeType.JSON);
+}
+function doPost(e) {
+  const body = JSON.parse(e.postData.contents || '{}');
+  const room = body.room || 'SUG_HFF_GERAL';
+  PropertiesService.getScriptProperties().setProperty('TURNOS_' + room, JSON.stringify(body.data || {}));
+  return ContentService.createTextOutput(JSON.stringify({ ok: true })).setMimeType(ContentService.MimeType.JSON);
+}</div>
+            </div>
+          `;
+        } else if (m === 'FIREBASE_RTDB') {
+          syncGuideContainer.innerHTML = `<p style="margin:6px 0 0; font-size:0.74rem; color:#5c434a;">Usa o URL base da tua Firebase Realtime Database (ex.: <code>https://projeto-default-rtdb.firebaseio.com</code>). Os dados são guardados em <code>/rooms/&lt;sala&gt;.json</code>.</p>`;
+        } else if (m === 'FIRESTORE_REST') {
+          syncGuideContainer.innerHTML = `<p style="margin:6px 0 0; font-size:0.74rem; color:#5c434a;">Usa o URL REST da coleção Firestore (ex.: <code>https://firestore.googleapis.com/v1/projects/PROJETO/databases/(default)/documents/trocas_sug_hff</code>).</p>`;
+        } else {
+          syncGuideContainer.innerHTML = '';
+        }
+      }
+
+      function toggleRemoteSyncBox() {
+        if (syncModeSelect.value === 'LOCAL') {
+          remoteSyncConfigBox.classList.add('hidden');
+        } else {
+          remoteSyncConfigBox.classList.remove('hidden');
+          renderSyncGuide();
+        }
+      }
+
+      openSyncBtn.addEventListener('click', () => {
+        syncModeSelect.value = syncConfig.mode || 'LOCAL';
+        syncUrlInput.value = syncConfig.url || '';
+        syncRoomInput.value = syncConfig.room || 'SUG_HFF_GERAL';
+        syncIntervalInput.value = String(syncConfig.intervalMs || 15000);
+        toggleRemoteSyncBox();
+        syncModal.classList.add('open');
+      });
+
+      function closeSyncModal() {
+        syncModal.classList.remove('open');
+      }
+
+      closeSyncModalBtn.addEventListener('click', closeSyncModal);
+      cancelSyncBtn.addEventListener('click', closeSyncModal);
+      syncModal.addEventListener('click', (e) => {
+        if (e.target === syncModal) closeSyncModal();
+      });
+
+      syncModeSelect.addEventListener('change', toggleRemoteSyncBox);
+
+      function buildRemoteData() {
+        return {
+          room: (syncConfig.room || 'SUG_HFF_GERAL').trim(),
+          updatedAt: new Date().toISOString(),
+          requests: swapRequests,
+          notifications
+        };
+      }
+
+      function applyRemoteData(rawObj) {
+        if (!rawObj || typeof rawObj !== 'object') return;
+        const payload = rawObj.data && typeof rawObj.data === 'object' ? rawObj.data : rawObj;
+        if (Array.isArray(payload.requests)) {
+          swapRequests = payload.requests;
+          saveJSON(KEYS.REQUESTS, swapRequests);
+        }
+        if (Array.isArray(payload.notifications)) {
+          notifications = payload.notifications;
+          saveJSON(KEYS.NOTIFS, notifications);
+        }
+      }
+
+      async function pullRemoteState(silent) {
+        if (syncConfig.mode === 'LOCAL' || !syncConfig.url.trim()) return false;
+        try {
+          const baseUrl = syncConfig.url.trim().replace(/\/+$/, '');
+          const room = encodeURIComponent((syncConfig.room || 'SUG_HFF_GERAL').trim());
+
+          if (syncConfig.mode === 'APPS_SCRIPT') {
+            const sep = baseUrl.includes('?') ? '&' : '?';
+            const res = await fetch(`${baseUrl}${sep}room=${room}&t=${Date.now()}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const json = await res.json();
+            applyRemoteData(json);
+          } else if (syncConfig.mode === 'FIREBASE_RTDB') {
+            const rtdbUrl = baseUrl.endsWith('.json') ? baseUrl : `${baseUrl}/rooms/${room}.json`;
+            const res = await fetch(rtdbUrl);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const json = await res.json();
+            if (json) applyRemoteData(json);
+          } else if (syncConfig.mode === 'FIRESTORE_REST') {
+            const res = await fetch(`${baseUrl}/${room}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const doc = await res.json();
+            const rawStr = doc && doc.fields && doc.fields.payloadJson && doc.fields.payloadJson.stringValue;
+            if (rawStr) applyRemoteData(JSON.parse(rawStr));
+          }
+
+          const stamp = new Date().toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+          syncStatusDetail.textContent = `Sincronizado às ${stamp} (${syncConfig.room}).`;
+          updateSyncIndicator('ok', `Sincronizado (${stamp})`);
+          renderAll();
+          return true;
+        } catch (err) {
+          syncStatusDetail.textContent = `Erro: ${err && err.message ? err.message : 'Falha de ligação'}`;
+          updateSyncIndicator('error', 'Erro de sincronização');
+          if (!silent) showToast('Não foi possível sincronizar com o servidor remoto.', 'error');
+          return false;
+        }
+      }
+
+      async function pushRemoteState(silent) {
+        if (syncConfig.mode === 'LOCAL' || !syncConfig.url.trim()) return false;
+        try {
+          const baseUrl = syncConfig.url.trim().replace(/\/+$/, '');
+          const room = (syncConfig.room || 'SUG_HFF_GERAL').trim();
+          const data = buildRemoteData();
+
+          if (syncConfig.mode === 'APPS_SCRIPT') {
+            await fetch(baseUrl, {
+              method: 'POST',
+              mode: 'no-cors',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({ room, data })
+            });
+          } else if (syncConfig.mode === 'FIREBASE_RTDB') {
+            const rtdbUrl = baseUrl.endsWith('.json') ? baseUrl : `${baseUrl}/rooms/${encodeURIComponent(room)}.json`;
+            const res = await fetch(rtdbUrl, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          } else if (syncConfig.mode === 'FIRESTORE_REST') {
+            const res = await fetch(`${baseUrl}/${encodeURIComponent(room)}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                fields: {
+                  room: { stringValue: room },
+                  updatedAt: { stringValue: data.updatedAt },
+                  payloadJson: { stringValue: JSON.stringify(data) }
+                }
+              })
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          }
+
+          const stamp = new Date().toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+          syncStatusDetail.textContent = `Atualizado às ${stamp} (${room}).`;
+          updateSyncIndicator('ok', `Ao vivo · ${syncConfig.mode}`);
+          return true;
+        } catch (err) {
+          updateSyncIndicator('error', 'Erro ao enviar');
+          if (!silent) showToast('Erro ao enviar dados para a sincronização remota.', 'error');
+          return false;
+        }
+      }
+
+      function setupPolling() {
+        if (pollTimer) {
+          clearInterval(pollTimer);
+          pollTimer = null;
+        }
+        if (syncConfig.mode !== 'LOCAL' && syncConfig.url.trim() && Number(syncConfig.intervalMs) > 0) {
+          pollTimer = setInterval(() => {
+            pullRemoteState(true);
+          }, Number(syncConfig.intervalMs));
+        }
+      }
+
+      testSyncNowBtn.addEventListener('click', async () => {
+        const mode = syncModeSelect.value;
+        const url = syncUrlInput.value.trim();
+        const room = (syncRoomInput.value || 'SUG_HFF_GERAL').trim();
+        if (mode === 'LOCAL') {
+          showToast('Modo local ativo entre abas deste dispositivo.', 'info');
+          return;
+        }
+        if (!url) {
+          showToast('Indica primeiro o URL do endpoint.', 'error');
+          return;
+        }
+        syncConfig = { mode, url, room, intervalMs: Number(syncIntervalInput.value || 15000) };
+        saveJSON(KEYS.SYNC, syncConfig);
+        const ok = await pullRemoteState(false);
+        if (ok) {
+          await pushRemoteState(true);
+          showToast('Ligação testada e sincronizada!', 'success');
+        }
+      });
+
+      syncForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const mode = syncModeSelect.value;
+        const url = syncUrlInput.value.trim();
+        const room = (syncRoomInput.value || 'SUG_HFF_GERAL').trim();
+        const intervalMs = Number(syncIntervalInput.value || 15000);
+
+        if (mode !== 'LOCAL' && !url) {
+          showToast('Introduz o URL do endpoint partilhado.', 'error');
+          return;
+        }
+
+        syncConfig = { mode, url, room, intervalMs };
+        saveJSON(KEYS.SYNC, syncConfig);
+        setupPolling();
+        closeSyncModal();
+
+        if (mode !== 'LOCAL') {
+          await pullRemoteState(true);
+          await pushRemoteState(true);
+          showToast('Sincronização em tempo real guardada.', 'success');
+        } else {
+          updateSyncIndicator('local', 'Sincronização: Local');
+          syncStatusDetail.textContent = 'Modo ativo: Local neste dispositivo.';
+          showToast('Modo local guardado.', 'success');
+        }
+      });
+
+      if (channel) {
+        channel.onmessage = () => {
+          swapRequests = loadJSON(KEYS.REQUESTS, swapRequests);
+          notifications = loadJSON(KEYS.NOTIFS, notifications);
+          users = loadJSON(KEYS.USERS, users);
+          renderAll();
+        };
+      }
+
+      window.addEventListener('storage', (e) => {
+        if (e.key === KEYS.REQUESTS || e.key === KEYS.NOTIFS || e.key === KEYS.USERS) {
+          swapRequests = loadJSON(KEYS.REQUESTS, swapRequests);
+          notifications = loadJSON(KEYS.NOTIFS, notifications);
+          users = loadJSON(KEYS.USERS, users);
+          renderAll();
+        }
+      });
+
+      // =====================================================================
+      // RENDERIZAÇÃO GLOBAL
+      // =====================================================================
+      function renderSessionBar() {
+        if (currentUser) {
+          const rInfo = ROLE_INFO[currentUser.role] || ROLE_INFO.ENFERMEIRO;
+          authLoggedOutBox.classList.add('hidden');
+          authLoggedInBox.classList.remove('hidden');
+          openPrefsBtn.classList.remove('hidden');
+
+          userSummaryBadge.className = `badge ${rInfo.badgeClass}`;
+          userSummaryBadge.textContent = `${formatNurseIdentity(currentUser.name, currentUser.mec)} · ${rInfo.label}`;
+
+          const prefText = NOTIF_PREF_LABEL[currentUser.notifPref] || 'Ambos';
+          bannerSessionNotice.textContent = `Sessão ativa: ${formatNurseIdentity(currentUser.name, currentUser.mec)} (${rInfo.label}) · Notificações: ${prefText}.`;
+        } else {
+          authLoggedOutBox.classList.remove('hidden');
+          authLoggedInBox.classList.add('hidden');
+          openPrefsBtn.classList.add('hidden');
+          bannerSessionNotice.textContent = 'Podes entrar com qualquer e-mail à tua escolha ou usar um perfil de demonstração.';
+        }
+      }
+
+      function renderStats() {
+        document.getElementById('statOpen').textContent = String(swapRequests.filter((r) => r.status === 'OPEN').length);
+        document.getElementById('statPending').textContent = String(swapRequests.filter((r) => r.status === 'PENDING').length);
+      }
+
+      function renderAll() {
+        renderSessionBar();
+        updateUnreadBadge();
+        renderStats();
+        renderBoard();
+        renderMyCompletedTable();
+      }
+
+      initDates();
+      renderDraftOffers();
+      updateSyncIndicator('local', syncConfig.mode === 'LOCAL' ? 'Sincronização: Local' : `Ao vivo · ${syncConfig.mode}`);
+      setupPolling();
+      renderAll();
+      if (syncConfig.mode !== 'LOCAL' && syncConfig.url.trim()) {
+        pullRemoteState(true);
+      }
+    })();
+  </script>
+</body>
+</html>
